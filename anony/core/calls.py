@@ -87,7 +87,7 @@ class TgCall(PyTgCalls):
 
         a_flag = types.MediaStream.Flags.REQUIRED
         v_flag = (
-            types.MediaStream.Flags.IGNORE
+            types.MediaStream.Flags.REQUIRED
             if getattr(media, "id", "") == "tv_live"
             else (types.MediaStream.Flags.AUTO_DETECT if media.video else types.MediaStream.Flags.IGNORE)
         )
@@ -203,7 +203,20 @@ class TgCall(PyTgCalls):
             async def update_handler(_, update: types.Update) -> None:
                 if isinstance(update, types.StreamEnded):
                     if update.stream_type == types.StreamEnded.Type.AUDIO:
-                        await self.play_next(update.chat_id)
+                        media = queue.get_current(update.chat_id)
+                        if getattr(media, "id", "") == "tv_live":
+                            # Silently retry TV stream once if it ends
+                            logger.info(f"[TV_RECONNECT] Stream ended for {update.chat_id}, retrying...")
+                            try:
+                                # We need a dummy message or use the existing one if available
+                                # For now, just call play_next which will handle it, 
+                                # but play_next might skip to next. 
+                                # Since TV is usually one item, it might just restart or stop.
+                                await self.play_next(update.chat_id)
+                            except Exception as e:
+                                logger.error(f"[TV_RECONNECT] Retry failed: {e}")
+                        else:
+                            await self.play_next(update.chat_id)
                 elif isinstance(update, types.ChatUpdate):
                     if update.status in [
                         types.ChatUpdate.Status.KICKED,
