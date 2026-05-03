@@ -245,32 +245,38 @@ async def radio_callback_handler(_, query: types.CallbackQuery):
 
 
 
-from anony.helpers.tv import category_markup, channel_markup, fetch_stream_url, load_channels
+from anony.helpers.tv import category_markup, channel_markup, fetch_stream_url, fetch_channels
 
 @app.on_callback_query(filters.regex("tv_home") & ~app.bl_users)
 @lang.language()
 async def tv_home_callback(_, query: types.CallbackQuery):
+    await query.answer("Fetching categories...")
+    channels = await fetch_channels()
     await query.edit_message_text(
         "📺 <b>TV Station Categories</b>\nChoose a category to find a station:",
-        reply_markup=category_markup()
+        reply_markup=category_markup(channels)
     )
 
 @app.on_callback_query(filters.regex(r"^tv_cat:") & ~app.bl_users)
 @lang.language()
 async def tv_category_callback(_, query: types.CallbackQuery):
     category = query.data.split(":")[1]
+    await query.answer(f"Fetching {category} channels...")
+    channels = await fetch_channels()
     await query.edit_message_text(
         f"📺 <b>Category: {category}</b>\nChoose a station:",
-        reply_markup=channel_markup(category, 1)
+        reply_markup=channel_markup(category, channels, 1)
     )
 
 @app.on_callback_query(filters.regex(r"^tv_page:") & ~app.bl_users)
 @lang.language()
 async def tv_page_callback(_, query: types.CallbackQuery):
     _, category, page = query.data.split(":")
+    await query.answer(f"Fetching page {page}...")
+    channels = await fetch_channels()
     await query.edit_message_text(
         f"📺 <b>Category: {category}</b>\nChoose a station (Page {page}):",
-        reply_markup=channel_markup(category, int(page))
+        reply_markup=channel_markup(category, channels, int(page))
     )
 
 @app.on_callback_query(filters.regex(r"^tv_ch:") & ~app.bl_users)
@@ -280,7 +286,7 @@ async def tv_channel_callback(_, query: types.CallbackQuery):
     chat_id = query.message.chat.id
     user_mention = query.from_user.mention
     
-    channels = load_channels()
+    channels = await fetch_channels()
     target_channel = next((c for c in channels if c["id"] == channel_id), None)
     
     if not target_channel:
@@ -304,7 +310,7 @@ async def tv_channel_callback(_, query: types.CallbackQuery):
         url=stream_url,
         file_path=stream_url,
         message_id=query.message.id,
-        thumbnail=target_channel.get("thumbnail") or target_channel.get("channelImage") or config.DEFAULT_THUMB,
+        thumbnail=target_channel.get("thumbnail") or config.DEFAULT_THUMB,
         user=user_mention,
         view_count="Live",
         video=True
@@ -314,25 +320,20 @@ async def tv_channel_callback(_, query: types.CallbackQuery):
     media_obj.quality = "low"
     media_obj.headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
-        "Referer": "https://viu.lk/"
     }
     
     try:
         from anony import logger
         logger.info(f"📺 TV Playback URL for {target_channel['title']}: {stream_url}")
-        print(f"📺 TV Playback URL for {target_channel['title']}: {stream_url}")
 
         await anon.play_media(chat_id=chat_id, message=query.message, media=media_obj)
         queue.force_add(chat_id, media_obj)
         
         await query.edit_message_text(
-
             f"📡 <b>Now Streaming:</b> {target_channel['title']} (Low Quality)\nRequested by: {user_mention}\n\nSelect another station to switch:",
             reply_markup=query.message.reply_markup
         )
     except Exception as e:
-        import traceback
-        traceback.print_exc()
         await query.message.reply_text(f"❌ Error switching station: {type(e).__name__} - {e}")
 
 

@@ -12,7 +12,7 @@ from anony.helpers.radio import radio_markup
 
 
 
-from anony.helpers.tv import category_markup
+from anony.helpers.tv import category_markup, fetch_channels
 
 @app.on_message(filters.command("tv") & filters.group & ~app.bl_users)
 @lang.language()
@@ -24,9 +24,14 @@ async def tv_command_handler(
     video: bool = False, 
     url: str = None
 ):
-    await m.reply_text(
+    sent = await m.reply_text("📡 <b>Fetching TV channels...</b>")
+    channels = await fetch_channels()
+    if not channels:
+        return await sent.edit_text("❌ Failed to fetch TV channels. Please try again later.")
+        
+    await sent.edit_text(
         "📺 <b>TV Station Categories</b>\nChoose a category to find a station:",
-        reply_markup=category_markup()
+        reply_markup=category_markup(channels)
     )
 
 
