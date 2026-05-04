@@ -2,8 +2,14 @@ name: Update TV Channel List
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Run every 30 minutes
-  workflow_dispatch: # Allow manual trigger
+    - cron: '*/30 * * * *'
+  push:
+    branches:
+      - master
+    paths:
+      - 'scripts/update_tv.py'
+      - 'anony/helpers/adult.m3u'
+  workflow_dispatch:
 
 jobs:
   update-list:
@@ -11,6 +17,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Set up Python
         uses: actions/setup-python@v4
