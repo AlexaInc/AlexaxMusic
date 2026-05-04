@@ -1,7 +1,8 @@
 from ntgcalls import ConnectionNotFound, TelegramServerError
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message
-from pytgcalls import PyTgCalls, filters, types
+from pytgcalls import PyTgCalls, exceptions, filters, types
+from pytgcalls.pytgcalls_session import PyTgCallsSession
 from pytgcalls.types import VideoQuality
 from pytgcalls.types.py_object import PyObject
 from enum import Enum
