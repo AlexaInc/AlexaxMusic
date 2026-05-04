@@ -10,10 +10,12 @@ M3U_URLS = [
     "https://iptv-org.github.io/iptv/countries/lk.m3u",
     "https://iptv-org.github.io/iptv/languages/sin.m3u",
     "https://iptv-org.github.io/iptv/categories/news.m3u",
-    "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8"
+    "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
+    "https://iptv-org.github.io/iptv/categories/kids.m3u",
+    "https://iptv-org.github.io/iptv/categories/animation.m3u"
 ]
 
-def parse_m3u(content, filter_group=None):
+def parse_m3u(content, filter_group=None, force_prefix=None):
     channels = []
     # Match #EXTINF line and the following URL
     pattern = r'#EXTINF:-1(.*?),(.*?)\n(https?://[^\s]+)'
@@ -37,9 +39,18 @@ def parse_m3u(content, filter_group=None):
         if filter_group and filter_group.lower() not in group.lower():
             continue
 
-        # Clean up group title (remove extra spaces or semicolons if multiple categories)
-        if ";" in group:
-            group = group.split(";")[0]
+        # Specialized grouping for Kids/Animation
+        if force_prefix:
+            # Extract subcategories (exclude the prefix itself)
+            sub_cats = [c.strip() for c in group.split(";") if c.strip().lower() != force_prefix.lower()]
+            if sub_cats:
+                group = f"{force_prefix} - {sub_cats[0]}"
+            else:
+                group = force_prefix
+        else:
+            # Clean up group title (take first category)
+            if ";" in group:
+                group = group.split(";")[0]
             
         channels.append({
             "id": tv_id,
@@ -60,9 +71,11 @@ async def fetch_channels():
             try:
                 response = await client.get(url, timeout=15)
                 if response.status_code == 200:
-                    # Only filter for 'Movies' in the large Free-TV playlist
+                    # Logic for filtering and grouping
                     filter_pattern = "Movies" if "Free-TV/IPTV" in url else None
-                    channels.extend(parse_m3u(response.text, filter_group=filter_pattern))
+                    prefix = "Kids" if ("/kids.m3u" in url or "/animation.m3u" in url) else None
+                    
+                    channels.extend(parse_m3u(response.text, filter_group=filter_pattern, force_prefix=prefix))
             except Exception as e:
                 print(f"Error fetching TV list from {url}: {e}")
     

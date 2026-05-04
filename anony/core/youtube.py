@@ -75,52 +75,49 @@ class YouTube:
             "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
         }
         
-        try:
-            # Connect directly to the external search API without proxy. 
-            # The API bypasses YouTube blocks for us.
-            async with aiohttp.ClientSession(headers=headers) as session:
-                async with session.post(url, json={"query": query}, timeout=15) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        results = data.get("results", [])
-                        
-                        if results and isinstance(results, list) and len(results) > 0:
-                            # Take the first search result
-                            item = results[0]
-                            video_id = item.get("videoId")
+        # Retry up to 2 times for search
+        for attempt in range(2):
+            try:
+                # trust_env=False to bypass unstable system proxies
+                async with aiohttp.ClientSession(headers=headers, trust_env=False) as session:
+                    async with session.post(url, json={"query": query}, timeout=aiohttp.ClientTimeout(total=25)) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            results = data.get("results", [])
                             
-                            if video_id:
-                                thumbnails = item.get("thumbnail", [])
-                                thumbnail_url = thumbnails[-1]['url'].split("?")[0] if thumbnails else None
+                            if results and isinstance(results, list) and len(results) > 0:
+                                item = results[0]
+                                video_id = item.get("videoId")
                                 
-                                length_text = item.get("duration", "0:00")
-                                viewCountText = item.get("shortViewCount", "0 views").split(" ")[0]
-                                
-                                return Track(
-                                    id=video_id,
-                                    channel_name=item.get("channelName", "Unknown Channel")[:25],
-                                    duration=length_text,
-                                    duration_sec=utils.to_seconds(length_text),
-                                    message_id=m_id,
-                                    title=item.get("title", "Unknown Title")[:25],
-                                    thumbnail=thumbnail_url,
-                                    url=f"https://www.youtube.com/watch?v={video_id}",
-                                    view_count=viewCountText,
-                                    video=video,
-                                )
-                    else:
-                        logger.error(f"External API failed with status {resp.status}")
-                        
-            return None
-        except Exception as e:
-            logger.error(f"Custom YouTube search failed: {type(e).__name__} - {e}\n{traceback.format_exc()}")
-            return None
+                                if video_id:
+                                    thumbnails = item.get("thumbnail", [])
+                                    thumbnail_url = thumbnails[-1]['url'].split("?")[0] if thumbnails else None
+                                    length_text = item.get("duration", "0:00")
+                                    viewCountText = item.get("shortViewCount", "0 views").split(" ")[0]
+                                    
+                                    return Track(
+                                        id=video_id,
+                                        channel_name=item.get("channelName", "Unknown Channel")[:25],
+                                        duration=length_text,
+                                        duration_sec=utils.to_seconds(length_text),
+                                        message_id=m_id,
+                                        title=item.get("title", "Unknown Title")[:25],
+                                        thumbnail=thumbnail_url,
+                                        url=f"https://www.youtube.com/watch?v={video_id}",
+                                        view_count=viewCountText,
+                                        video=video,
+                                    )
+                        else:
+                            logger.error(f"External Search API failed with status {resp.status} (Attempt {attempt+1})")
+            except Exception as e:
+                logger.error(f"Custom YouTube search attempt {attempt+1} failed: {type(e).__name__} - {e}")
+                if attempt == 0:
+                    await asyncio.sleep(1) # Brief pause before retry
+                    
+        return None
 
     async def playlist(self, limit: int, user: str, url: str, video: bool) -> list[Track | None]:
         tracks = []
@@ -165,29 +162,34 @@ class YouTube:
         }
 
         # Download logic using the new Hansaka API (returns raw buffer)
-        try:
-            # Bypassing proxy for internal HF space communication
-            async with aiohttp.ClientSession(headers=HEADERS, trust_env=False) as session:
-                async with session.post(api_url, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as resp:
-                    if resp.status == 200:
-                        with open(filename, "wb") as f:
-                            while True:
-                                chunk = await resp.content.read(1024 * 1024) # 1MB chunks
-                                if not chunk:
-                                    break
-                                f.write(chunk)
-                        
-                        if os.path.getsize(filename) > 0:
-                            return filename
+        for attempt in range(2):
+            try:
+                # Bypassing proxy for internal HF space communication
+                async with aiohttp.ClientSession(headers=HEADERS, trust_env=False) as session:
+                    async with session.post(api_url, json=payload, timeout=aiohttp.ClientTimeout(total=450)) as resp:
+                        if resp.status == 200:
+                            with open(filename, "wb") as f:
+                                while True:
+                                    chunk = await resp.content.read(1024 * 1024) # 1MB chunks
+                                    if not chunk:
+                                        break
+                                    f.write(chunk)
+                            
+                            if os.path.exists(filename) and os.path.getsize(filename) > 0:
+                                return filename
+                            else:
+                                logger.error(f"Downloaded file {filename} is empty (Attempt {attempt+1}).")
+                                if os.path.exists(filename): os.remove(filename)
                         else:
-                            logger.error(f"Downloaded file {filename} is empty.")
-                            os.remove(filename)
-                    else:
-                        error_text = await resp.text()
-                        logger.error(f"Hansaka API Error {resp.status}: {error_text}")
-        except Exception as ex:
-            logger.error(f"Hansaka Download failed: {ex}")
-            if os.path.exists(filename):
-                os.remove(filename)
+                            error_text = await resp.text()
+                            logger.error(f"Hansaka API Error {resp.status} (Attempt {attempt+1}): {error_text}")
+            except Exception as ex:
+                logger.error(f"Hansaka Download attempt {attempt+1} failed: {ex}")
+                if os.path.exists(filename):
+                    os.remove(filename)
+                if attempt == 0:
+                    await asyncio.sleep(2) # Pause before retry
+        
+        return None
         
         return None
