@@ -58,18 +58,37 @@ def parse_m3u(content, filter_group=None, force_prefix=None):
         })
     return channels
 
-async def verify_channel(client, channel):
-    url = channel["manifest"]
-    try:
-        # Some streams don't support HEAD, so we use GET with a small timeout
-        # and only read a few bytes to verify connectivity and format.
-        async with client.stream("GET", url, timeout=5, follow_redirects=True) as response:
-            if response.status_code == 200:
-                # Read a small chunk to ensure it's not just a successful 200 with an error page
-                # chunk = await response.aiter_bytes(chunk_size=128).__anext__()
-                return channel
-    except Exception:
-        pass
+async def verify_channel(semaphore, channel, timeout=10):
+    """Use ffprobe to verify if the stream has a valid video source."""
+    async with semaphore:
+        url = channel["manifest"]
+        # Use ffprobe to check for video streams. -t 3 limits probing time.
+        cmd = [
+            "ffprobe",
+            "-v", "error",
+            "-select_streams", "v:0",
+            "-show_entries", "stream=codec_type",
+            "-of", "csv=p=0",
+            "-timeout", str(timeout * 1000000), # microseconds
+            url
+        ]
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            try:
+                stdout, _ = await asyncio.wait_for(process.communicate(), timeout=timeout + 2)
+                if stdout.decode().strip() == "video":
+                    return channel
+            except asyncio.TimeoutError:
+                try:
+                    process.terminate()
+                except:
+                    pass
+        except Exception:
+            pass
     return None
 
 async def main():
@@ -116,12 +135,8 @@ async def main():
         print(f"Found {len(channels_to_verify)} unique channels. Verifying...")
 
         # 3. Verify channels in parallel
-        semaphore = asyncio.Semaphore(20) # Limit concurrency
-        async def sem_verify(ch):
-            async with semaphore:
-                return await verify_channel(client, ch)
-
-        tasks = [sem_verify(ch) for ch in channels_to_verify]
+        semaphore = asyncio.Semaphore(15) # Limit concurrency for ffprobe
+        tasks = [verify_channel(semaphore, ch) for ch in channels_to_verify]
         results = await asyncio.gather(*tasks)
         
         working_channels = [r for r in results if r]
