@@ -19,14 +19,14 @@ M3U_URLS = [
 
 def parse_m3u(content, filter_group=None, force_prefix=None):
     channels = []
-    # Match #EXTINF line and the following URL
-    pattern = r'#EXTINF:-1(.*?),(.*?)\n(https?://[^\s]+)'
+    # Match #EXTINF line (supporting any duration like 0 or -1) and the following URL
+    pattern = r'#EXTINF:(-?\d+)(.*?),(.*?)\n(https?://[^\s]+)'
     matches = re.finditer(pattern, content)
     
     for match in matches:
-        attrs_block = match.group(1)
-        title = match.group(2).strip()
-        url = match.group(3).strip()
+        attrs_block = match.group(2)
+        title = match.group(3).strip()
+        url = match.group(4).strip()
         
         # Extract attributes from attrs_block
         tvg_id = re.search(r'tvg-id="([^"]*)"', attrs_block)
@@ -41,11 +41,12 @@ def parse_m3u(content, filter_group=None, force_prefix=None):
         if filter_group and filter_group.lower() not in group.lower():
             continue
 
-        # Specialized grouping for Kids/Animation
+        # Specialized grouping for hierarchical menu
         if force_prefix:
             # Extract subcategories (exclude the prefix itself)
             sub_cats = [c.strip() for c in group.split(";") if c.strip().lower() != force_prefix.lower()]
-            if sub_cats:
+            # If sub_cat is 'General' and we have a force_prefix, just use the force_prefix
+            if sub_cats and sub_cats[0].lower() not in ["general", "other", ""]:
                 group = f"{force_prefix} - {sub_cats[0]}"
             else:
                 group = force_prefix
