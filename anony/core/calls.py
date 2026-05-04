@@ -115,17 +115,11 @@ class TgCall(PyTgCalls):
         try:
             for attempt in range(retry_count):
                 try:
-                    if await db.get_call(chat_id):
-                        await client.change_stream(
-                            chat_id=chat_id,
-                            stream=stream,
-                        )
-                    else:
-                        await client.play(
-                            chat_id=chat_id,
-                            stream=stream,
-                            config=types.GroupCallConfig(auto_start=False),
-                        )
+                    await client.play(
+                        chat_id=chat_id,
+                        stream=stream,
+                        config=types.GroupCallConfig(auto_start=False),
+                    )
                     break # Success
                 except Exception as e:
                     if attempt == retry_count - 1:
