@@ -15,7 +15,15 @@ M3U_URLS = [
     "https://iptv-org.github.io/iptv/categories/kids.m3u",
     "https://iptv-org.github.io/iptv/categories/animation.m3u",
     "https://iptvmate.net/files/adult.m3u",
-    "anony/helpers/adult.m3u"
+    "anony/helpers/adult.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/action-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/animation-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/science-fiction-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/horror-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/fantasy-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/comedy-movies.m3u",
+    "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/thriller-movies.m3u",
+    "https://iptv-org.github.io/iptv/categories/movies.m3u"
 ]
 
 def parse_m3u(content, filter_group=None, force_prefix=None):
@@ -119,6 +127,10 @@ async def main():
                         elif "Free-TV/IPTV" in url: prefix = "Movies"
                         elif "/lk.m3u" in url or "/sin.m3u" in url: prefix = "Sri Lanka"
                         elif "iptvmate.net" in url: prefix = "Adult"
+                        elif "supabase.co" in url:
+                            genre = url.split("/")[-1].replace("-movies.m3u", "").replace("-", " ").title()
+                            prefix = f"Movies - {genre}"
+                        elif "/categories/movies.m3u" in url: prefix = "Movies"
                 else:
                     if os.path.exists(url):
                         with open(url, "r", encoding="utf-8") as f:
