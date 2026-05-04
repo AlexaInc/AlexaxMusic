@@ -23,13 +23,16 @@ import asyncio
 
 _original_check_stream = pytgcalls.types.stream.media_stream.check_stream
 
-async def _fast_check_stream(file_path: str, *args, **kwargs):
-    if "live365" in str(file_path) or "m3u8" in str(file_path).lower() or ".mpd" in str(file_path).lower():
+async def _fast_check_stream(ffmpeg_parameters: str, file_path: str, *args, **kwargs):
+    # In pytgcalls v2.2.8, the signature is (ffmpeg_parameters, path, ...)
+    # If the monkey patch was designed for (path, ...), it would fail to match keywords.
+    path_str = str(file_path).lower()
+    if any(k in path_str for k in ["live365", "m3u8", ".mpd", "pls", "zeno.fm"]):
         from pytgcalls.exceptions import LiveStreamFound
         logger.warning(f"[FFPROBE FAST PASS] Forcing LiveStreamFound for {file_path}")
-        raise LiveStreamFound("Bypassed Stream Check for Live Media")
+        raise LiveStreamFound(file_path)
     
-    return await _original_check_stream(file_path, *args, **kwargs)
+    return await _original_check_stream(ffmpeg_parameters, file_path, *args, **kwargs)
 
 pytgcalls.types.stream.media_stream.check_stream = _fast_check_stream
 pytgcalls.ffmpeg.check_stream = _fast_check_stream
