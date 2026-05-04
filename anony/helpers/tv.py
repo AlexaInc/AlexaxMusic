@@ -13,6 +13,7 @@ M3U_URLS = [
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
     "https://iptv-org.github.io/iptv/categories/kids.m3u",
     "https://iptv-org.github.io/iptv/categories/animation.m3u",
+    "https://iptvmate.net/files/adult.m3u",
     "anony/helpers/adult.m3u"
 ]
 
@@ -87,6 +88,8 @@ async def fetch_channels():
                             prefix = "Movies"
                         elif "/lk.m3u" in url or "/sin.m3u" in url:
                             prefix = "Sri Lanka"
+                        elif "iptvmate.net" in url:
+                            prefix = "Adult"
                 else:
                     # Handle local files (like anony/helpers/adult.m3u)
                     if os.path.exists(url):
