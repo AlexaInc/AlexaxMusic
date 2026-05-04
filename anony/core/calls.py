@@ -112,11 +112,17 @@ class TgCall(PyTgCalls):
             headers=media_headers
         )
         try:
-            await client.play(
-                chat_id=chat_id,
-                stream=stream,
-                config=types.GroupCallConfig(auto_start=False),
-            )
+            if await db.get_call(chat_id):
+                await client.change_stream(
+                    chat_id=chat_id,
+                    stream=stream,
+                )
+            else:
+                await client.play(
+                    chat_id=chat_id,
+                    stream=stream,
+                    config=types.GroupCallConfig(auto_start=False),
+                )
             if not seek_time:
                 media.time = 1
                 await db.add_call(chat_id)
