@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'scripts/update_tv.py'
-      - 'anony/helpers/adult.m3u'
   workflow_dispatch:
 
 jobs:
