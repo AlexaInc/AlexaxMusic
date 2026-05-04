@@ -70,34 +70,33 @@ async def fetch_channels():
     async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
         for url in M3U_URLS:
             try:
-                response = await client.get(url, timeout=15)
-                if response.status_code == 200:
-                    # Logic for filtering and grouping
-                    filter_pattern = "Movies" if "Free-TV/IPTV" in url else None
-                    prefix = None
-                    if "/kids.m3u" in url or "/animation.m3u" in url:
-                        prefix = "Kids"
-                    elif "/news.m3u" in url:
-                        prefix = "News"
-                    elif "Free-TV/IPTV" in url:
-                        prefix = "Movies"
-                    elif "/lk.m3u" in url or "/sin.m3u" in url:
-                        prefix = "Sri Lanka"
-                    elif "adult.m3u" in url:
-                        prefix = "Adult"
-                    
-                    content = response.text
+                content = None
+                prefix = None
+                filter_pattern = None
+                
+                if url.startswith("http"):
+                    response = await client.get(url, timeout=15)
+                    if response.status_code == 200:
+                        content = response.text
+                        filter_pattern = "Movies" if "Free-TV/IPTV" in url else None
+                        if "/kids.m3u" in url or "/animation.m3u" in url:
+                            prefix = "Kids"
+                        elif "/news.m3u" in url:
+                            prefix = "News"
+                        elif "Free-TV/IPTV" in url:
+                            prefix = "Movies"
+                        elif "/lk.m3u" in url or "/sin.m3u" in url:
+                            prefix = "Sri Lanka"
                 else:
-                    # Handle local files if needed (adult.m3u)
-                    if "adult.m3u" in url and os.path.exists(url):
+                    # Handle local files (like anony/helpers/adult.m3u)
+                    if os.path.exists(url):
                         with open(url, "r", encoding="utf-8") as f:
                             content = f.read()
-                        prefix = "Adult"
-                        filter_pattern = None
-                    else:
-                        continue
-
-                channels.extend(parse_m3u(content, filter_group=filter_pattern, force_prefix=prefix))
+                        if "adult.m3u" in url:
+                            prefix = "Adult"
+                
+                if content:
+                    channels.extend(parse_m3u(content, filter_group=filter_pattern, force_prefix=prefix))
             except Exception as e:
                 print(f"Error fetching TV list from {url}: {e}")
     
