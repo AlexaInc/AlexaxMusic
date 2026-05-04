@@ -122,6 +122,15 @@ class TgCall(PyTgCalls):
             ffmpeg_parameters=final_ffmpeg,
             headers=media_headers
         )
+        if getattr(media, "id", "") == "tv_live":
+            if await db.get_call(chat_id):
+                logger.info(f"[TV_RESET] Active call found, leaving before TV switch for {chat_id}")
+                try:
+                    await client.leave_call(chat_id)
+                    await asyncio.sleep(1.5) # Allow some time for the session to clear
+                except Exception as e:
+                    logger.warning(f"[TV_RESET] Leave call failed: {e}")
+
         retry_count = 2
         try:
             for attempt in range(retry_count):
