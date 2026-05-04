@@ -4,25 +4,12 @@ from pyrogram.types import InputMediaPhoto, Message
 from pytgcalls import PyTgCalls, exceptions, filters, types
 from pytgcalls.pytgcalls_session import PyTgCallsSession
 from pytgcalls.types import VideoQuality
-from pytgcalls.types.py_object import PyObject
-from enum import Enum
-import pytgcalls.types.stream.video_quality as vq_module
-import pytgcalls.types as pyt_types
 
-# Monkey-patch SD_240p into VideoQuality
-class NewVideoQuality(PyObject, Enum):
-    UHD_4K = (3840, 2160, 60)
-    QHD_2K = (2560, 1440, 60)
-    FHD_1080p = (1920, 1080, 60)
-    HD_720p = (1280, 720, 30)
-    SD_480p = (854, 480, 30)
-    SD_360p = (640, 360, 30)
-    SD_240p = (426, 240, 30)
-
-# Apply patches to both the module and the types namespace
-vq_module.VideoQuality = NewVideoQuality
-pyt_types.VideoQuality = NewVideoQuality
-VideoQuality = NewVideoQuality
+# TRICKY HACK: Override SD_360p value to be 240p and alias it.
+# This bypasses strict type-checking in pytgcalls (NewVideoQuality class was rejected).
+if hasattr(VideoQuality, "SD_360p"):
+    VideoQuality.SD_360p._value_ = (426, 240, 30)
+    VideoQuality.SD_240p = VideoQuality.SD_360p
 
 import anony.core.youtube as yt
 
