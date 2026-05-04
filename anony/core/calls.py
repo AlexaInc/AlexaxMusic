@@ -111,18 +111,26 @@ class TgCall(PyTgCalls):
             ffmpeg_parameters=final_ffmpeg,
             headers=media_headers
         )
-        try:
-            if await db.get_call(chat_id):
-                await client.change_stream(
-                    chat_id=chat_id,
-                    stream=stream,
-                )
-            else:
-                await client.play(
-                    chat_id=chat_id,
-                    stream=stream,
-                    config=types.GroupCallConfig(auto_start=False),
-                )
+        retry_count = 2
+        for attempt in range(retry_count):
+            try:
+                if await db.get_call(chat_id):
+                    await client.change_stream(
+                        chat_id=chat_id,
+                        stream=stream,
+                    )
+                else:
+                    await client.play(
+                        chat_id=chat_id,
+                        stream=stream,
+                        config=types.GroupCallConfig(auto_start=False),
+                    )
+                break # Success
+            except Exception as e:
+                if attempt == retry_count - 1:
+                    raise e # Re-raise on last attempt
+                logger.warning(f"Playback attempt {attempt+1} failed for {chat_id}: {e}. Retrying...")
+                await asyncio.sleep(2)
             if not seek_time:
                 media.time = 1
                 await db.add_call(chat_id)

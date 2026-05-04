@@ -58,7 +58,7 @@ def parse_m3u(content, filter_group=None, force_prefix=None):
         })
     return channels
 
-async def verify_channel(semaphore, channel, timeout=10):
+async def verify_channel(semaphore, channel, timeout=15):
     """Use ffprobe to verify if the stream has a valid video source."""
     async with semaphore:
         url = channel["manifest"]
