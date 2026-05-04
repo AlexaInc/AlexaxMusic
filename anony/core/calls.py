@@ -20,6 +20,7 @@ from anony.helpers import Media, Track, buttons, thumb
 import pytgcalls.ffmpeg
 import pytgcalls.types.stream.media_stream
 import asyncio
+from pathlib import Path
 
 _original_check_stream = pytgcalls.types.stream.media_stream.check_stream
 
