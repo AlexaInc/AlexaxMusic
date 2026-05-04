@@ -62,10 +62,11 @@ async def verify_channel(semaphore, channel, timeout=10):
     """Use ffprobe to verify if the stream has a valid video source."""
     async with semaphore:
         url = channel["manifest"]
-        # Use ffprobe to check for video streams. -t 3 limits probing time.
+        # Use ffprobe to check for video streams.
         cmd = [
             "ffprobe",
             "-v", "error",
+            "-user_agent", "Mozilla/5.0", # Bypass User-Agent blocks
             "-select_streams", "v:0",
             "-show_entries", "stream=codec_type",
             "-of", "csv=p=0",
@@ -80,7 +81,8 @@ async def verify_channel(semaphore, channel, timeout=10):
             )
             try:
                 stdout, _ = await asyncio.wait_for(process.communicate(), timeout=timeout + 2)
-                if stdout.decode().strip() == "video":
+                output = stdout.decode().lower()
+                if "video" in output: # Check if video stream exists at all
                     return channel
             except asyncio.TimeoutError:
                 try:
