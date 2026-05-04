@@ -87,7 +87,7 @@ def channel_markup(category, channels, page=0):
     
     keyboard = []
     for channel in current_channels:
-        keyboard.append([InlineKeyboardButton(channel["title"], callback_data=f"tv_play:{channel['id']}")])
+        keyboard.append([InlineKeyboardButton(channel["title"], callback_data=f"tv_ch:{channel['id']}")])
     
     nav_row = []
     if page > 0:
