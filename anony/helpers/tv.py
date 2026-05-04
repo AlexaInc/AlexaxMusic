@@ -12,7 +12,8 @@ M3U_URLS = [
     "https://iptv-org.github.io/iptv/categories/news.m3u",
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
     "https://iptv-org.github.io/iptv/categories/kids.m3u",
-    "https://iptv-org.github.io/iptv/categories/animation.m3u"
+    "https://iptv-org.github.io/iptv/categories/animation.m3u",
+    "anony/helpers/adult.m3u"
 ]
 
 def parse_m3u(content, filter_group=None, force_prefix=None):
@@ -82,8 +83,21 @@ async def fetch_channels():
                         prefix = "Movies"
                     elif "/lk.m3u" in url or "/sin.m3u" in url:
                         prefix = "Sri Lanka"
+                    elif "adult.m3u" in url:
+                        prefix = "Adult"
                     
-                    channels.extend(parse_m3u(response.text, filter_group=filter_pattern, force_prefix=prefix))
+                    content = response.text
+                else:
+                    # Handle local files if needed (adult.m3u)
+                    if "adult.m3u" in url and os.path.exists(url):
+                        with open(url, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        prefix = "Adult"
+                        filter_pattern = None
+                    else:
+                        continue
+
+                channels.extend(parse_m3u(content, filter_group=filter_pattern, force_prefix=prefix))
             except Exception as e:
                 print(f"Error fetching TV list from {url}: {e}")
     
@@ -184,7 +198,16 @@ def channel_markup(category, channels, page=1):
     if nav_row:
         keyboard.append(nav_row)
         
-    keyboard.append([InlineKeyboardButton("🔙 Back to Categories", callback_data="tv_home")])
+    # Improved navigation: check if this is part of a parent category
+    if " - " in category:
+        parent = category.split(" - ")[0]
+        keyboard.append([
+            InlineKeyboardButton(f"🔙 Back to {parent}", callback_data=f"tv_parent:{parent}"),
+            InlineKeyboardButton("🏠 Main Menu", callback_data="tv_home")
+        ])
+    else:
+        keyboard.append([InlineKeyboardButton("🔙 Back to Categories", callback_data="tv_home")])
+        
     return InlineKeyboardMarkup(keyboard)
 
 async def fetch_stream_url(manifest_url):
