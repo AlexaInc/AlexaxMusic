@@ -257,6 +257,17 @@ async def tv_home_callback(_, query: types.CallbackQuery):
         reply_markup=category_markup(channels)
     )
 
+@app.on_callback_query(filters.regex(r"^tv_parent:") & ~app.bl_users)
+@lang.language()
+async def tv_parent_callback(_, query: types.CallbackQuery):
+    parent = query.data.split(":")[1]
+    await query.answer(f"Loading {parent} categories...")
+    channels = await fetch_channels()
+    await query.edit_message_text(
+        f"📺 <b>Section: {parent}</b>\nChoose a sub-category:",
+        reply_markup=category_markup(channels, parent=parent)
+    )
+
 @app.on_callback_query(filters.regex(r"^tv_cat:") & ~app.bl_users)
 @lang.language()
 async def tv_category_callback(_, query: types.CallbackQuery):

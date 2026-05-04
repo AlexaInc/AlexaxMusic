@@ -1,9 +1,29 @@
-
 from ntgcalls import ConnectionNotFound, TelegramServerError
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message
-from pytgcalls import PyTgCalls, exceptions, types
-from pytgcalls.pytgcalls_session import PyTgCallsSession
+from pytgcalls import PyTgCalls, filters, types
+from pytgcalls.types import VideoQuality
+from pytgcalls.types.py_object import PyObject
+from enum import Enum
+import pytgcalls.types.stream.video_quality as vq_module
+import pytgcalls.types as pyt_types
+
+# Monkey-patch SD_240p into VideoQuality
+class NewVideoQuality(PyObject, Enum):
+    UHD_4K = (3840, 2160, 60)
+    QHD_2K = (2560, 1440, 60)
+    FHD_1080p = (1920, 1080, 60)
+    HD_720p = (1280, 720, 30)
+    SD_480p = (854, 480, 30)
+    SD_360p = (640, 360, 30)
+    SD_240p = (426, 240, 30)
+
+# Apply patches to both the module and the types namespace
+vq_module.VideoQuality = NewVideoQuality
+pyt_types.VideoQuality = NewVideoQuality
+VideoQuality = NewVideoQuality
+
+import anony.core.youtube as yt
 
 from anony import app, config, db, lang, logger, queue, userbot, yt
 from anony.helpers import Media, Track, buttons, thumb
@@ -97,7 +117,7 @@ class TgCall(PyTgCalls):
         stream = types.MediaStream(
             media_path=media.file_path,
             audio_parameters=types.AudioQuality.LOW,
-            video_parameters=types.VideoQuality.SD_360p,
+            video_parameters=VideoQuality.SD_240p,
             audio_flags=a_flag,
             video_flags=v_flag,
             ffmpeg_parameters=final_ffmpeg,

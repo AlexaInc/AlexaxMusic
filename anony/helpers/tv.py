@@ -73,7 +73,15 @@ async def fetch_channels():
                 if response.status_code == 200:
                     # Logic for filtering and grouping
                     filter_pattern = "Movies" if "Free-TV/IPTV" in url else None
-                    prefix = "Kids" if ("/kids.m3u" in url or "/animation.m3u" in url) else None
+                    prefix = None
+                    if "/kids.m3u" in url or "/animation.m3u" in url:
+                        prefix = "Kids"
+                    elif "/news.m3u" in url:
+                        prefix = "News"
+                    elif "Free-TV/IPTV" in url:
+                        prefix = "Movies"
+                    elif "/lk.m3u" in url or "/sin.m3u" in url:
+                        prefix = "Sri Lanka"
                     
                     channels.extend(parse_m3u(response.text, filter_group=filter_pattern, force_prefix=prefix))
             except Exception as e:
@@ -87,21 +95,56 @@ async def fetch_channels():
             
     return list(unique_channels.values())
 
-def get_categories(channels):
+def get_parents(channels):
+    """Extract top-level parent categories (e.g., 'Kids', 'Movies', 'News')."""
     categories = list(set([c["category"] for c in channels if "category" in c]))
-    categories.sort()
-    return categories
+    parents = set()
+    for cat in categories:
+        if " - " in cat:
+            parents.add(cat.split(" - ")[0])
+        else:
+            parents.add(cat)
+    res = list(parents)
+    res.sort()
+    return res
+
+def get_subcategories(parent, channels):
+    """Get actual categories that belong to a parent."""
+    categories = list(set([c["category"] for c in channels if "category" in c]))
+    subs = []
+    for cat in categories:
+        if cat == parent or cat.startswith(f"{parent} - "):
+            subs.append(cat)
+    subs.sort()
+    return subs
 
 def get_channels_by_category(category, channels):
     return [c for c in channels if c.get("category") == category]
 
-def category_markup(channels):
-    categories = get_categories(channels)
+def category_markup(channels, parent=None):
+    """
+    If parent is None, show top-level parents.
+    If parent is provided, show subcategories for that parent.
+    """
+    if parent is None:
+        items = get_parents(channels)
+        callback_prefix = "tv_parent"
+    else:
+        items = get_subcategories(parent, channels)
+        # If there's only one subcategory and it's equal to the parent, we might want to skip this level, 
+        # but let's be consistent for now.
+        callback_prefix = "tv_cat"
+        
     keyboard = []
     row = []
     
-    for cat in categories:
-        row.append(InlineKeyboardButton(cat, callback_data=f"tv_cat:{cat}"))
+    for item in items:
+        # Display name: for sub-categories, strip the parent prefix for cleaner UI
+        display_name = item
+        if parent and item.startswith(f"{parent} - "):
+            display_name = item.replace(f"{parent} - ", "")
+            
+        row.append(InlineKeyboardButton(display_name, callback_data=f"{callback_prefix}:{item}"))
         if len(row) >= 3:
             keyboard.append(row)
             row = []
@@ -109,7 +152,11 @@ def category_markup(channels):
     if row:
         keyboard.append(row)
         
-    keyboard.append([InlineKeyboardButton("❌ Close Play Menu", callback_data="help close")])
+    if parent:
+        keyboard.append([InlineKeyboardButton("🔙 Back to Main Categories", callback_data="tv_home")])
+    else:
+        keyboard.append([InlineKeyboardButton("❌ Close Play Menu", callback_data="help close")])
+        
     return InlineKeyboardMarkup(keyboard)
 
 def channel_markup(category, channels, page=1):
