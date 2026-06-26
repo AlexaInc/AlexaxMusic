@@ -546,13 +546,6 @@
     "thumbnail": "https://i.imgur.com/GtQOKeW.png"
   },
   {
-    "id": "AlNajahNews.ps@SD",
-    "title": "Al Najah News (720p)",
-    "category": "News",
-    "manifest": "https://streaming.najah.edu:8443/hls/AlNajah.m3u8",
-    "thumbnail": "https://i.imgur.com/c2bwn4G.png"
-  },
-  {
     "id": "AlYaumTV.ae@SD",
     "title": "Al Yaum TV (1080p)",
     "category": "News",
@@ -1001,13 +994,6 @@
     "thumbnail": "https://i.imgur.com/Xytvw3J.png"
   },
   {
-    "id": "CanalPyC.co@SD",
-    "title": "Canal PyC (720p)",
-    "category": "News",
-    "manifest": "https://live20.bozztv.com/akamaissh101/ssh101/pyctelevision/playlist.m3u8",
-    "thumbnail": "https://i.imgur.com/3qxBDhV.png"
-  },
-  {
     "id": "CanalSurNoticias.es@SD",
     "title": "Canal Sur Noticias",
     "category": "News - Public",
@@ -1083,6 +1069,13 @@
     "category": "News",
     "manifest": "https://cd-live-stream.news.cctvplus.com/live/smil:CHANNEL2.smil/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/qSg862A.png"
+  },
+  {
+    "id": "CEACOMTV.bo@SD",
+    "title": "CEACOM TV (1080p) [Not 24/7]",
+    "category": "News",
+    "manifest": "https://eu1.servers10.com:8081/ceacom/index.m3u8",
+    "thumbnail": "https://i.imgur.com/hutdRfk.png"
   },
   {
     "id": "CGTN.cn@SD",
@@ -1785,6 +1778,13 @@
     "thumbnail": "https://i.imgur.com/3yZyaCm.png"
   },
   {
+    "id": "GoodNewsToday.in@SD",
+    "title": "Good News Today (720p)",
+    "category": "News",
+    "manifest": "https://aajtaklive.vgcdn.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/3196cced-ce29-4219-9809-f07ccdaa02b9/vglive-sk-848805/master.m3u8",
+    "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GOOD_NEWS_TODAY/images/LOGO_HD/image.png"
+  },
+  {
     "id": "GTCNews.in@SD",
     "title": "GTC News (1080p)",
     "category": "News",
@@ -1804,6 +1804,13 @@
     "category": "News",
     "manifest": "https://cdn-edge1.streamcomedia.com/abr_tngr969fm/abr-tngr969fm_streams/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/o3cWUwL.png"
+  },
+  {
+    "id": "GugbangTV.kr@SD",
+    "title": "Gugbang TV (1080p) [Not 24/7]",
+    "category": "News",
+    "manifest": "http://mediaworks.dema.mil.kr:1935/live_edge/cudo.sdp/playlist.m3u8",
+    "thumbnail": "https://i.imgur.com/f1tz5fg.png"
   },
   {
     "id": "GulistanNews.in@SD",
@@ -2513,11 +2520,25 @@
     "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS9/images/LOGO_HD/image.png"
   },
   {
+    "id": "News12PlusConnecticut.us@HD",
+    "title": "News12+ Connecticut (1080p) [Geo-blocked]",
+    "category": "News",
+    "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12PLUS_H_CT_A1/index_new.m3u8",
+    "thumbnail": "https://i.ibb.co/n8m2mcsV/news12plus-CT.jpg"
+  },
+  {
     "id": "News12PlusHudsonValley.us@HD",
     "title": "News12+ Hudson Valley (1080p) [Geo-blocked]",
     "category": "News",
     "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12PLUS_H_WC_A1/index_new.m3u8",
     "thumbnail": "https://i.ibb.co/cKkdC203/news12plus-HV.jpg"
+  },
+  {
+    "id": "News12PlusLongIsland.us@HD",
+    "title": "News12+ Long Island (1080p) [Geo-blocked]",
+    "category": "News",
+    "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12PLUS_H_LI_A1/index_new.m3u8",
+    "thumbnail": "https://i.ibb.co/p6FPNcCk/news12plus-LI.jpg"
   },
   {
     "id": "News12PlusNewJersey.us@HD",
@@ -2534,6 +2555,13 @@
     "thumbnail": "https://i.ibb.co/tThKYM09/news12plus-NYC.jpg"
   },
   {
+    "id": "News12Bronx.us@SD",
+    "title": "News12 Bronx [Geo-blocked]",
+    "category": "News",
+    "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12XH_A1/index_new.m3u8?omap=https",
+    "thumbnail": "https://i.imgur.com/d6xQiaf.png"
+  },
+  {
     "id": "News12Brooklyn.us@SD",
     "title": "News12 Brooklyn [Geo-blocked]",
     "category": "News",
@@ -2545,6 +2573,13 @@
     "title": "News12 Conneticut [Geo-blocked]",
     "category": "News",
     "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12CH_FFLD_MILF_A1/index_new.m3u8?omap=https",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/News_12_logo_2019.png/960px-News_12_logo_2019.png"
+  },
+  {
+    "id": "News12HudsonValley.us@SD",
+    "title": "News12 Hudson Valley [Geo-blocked]",
+    "category": "News",
+    "manifest": "https://mdc.ott.alticeusa.net/live4.ott.optimum.net/live4-uploads/N12HH_A1/index_new.m3u8?omap=https",
     "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/News_12_logo_2019.png/960px-News_12_logo_2019.png"
   },
   {
@@ -2588,6 +2623,13 @@
     "category": "News",
     "manifest": "https://n18syndication.akamaized.net/bpk-tv/News18_Bangla_NW18_MOB/output01/master.m3u8",
     "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_BANGLA/images/LOGO_HD/image.png"
+  },
+  {
+    "id": "News18BiharJharkhand.in@SD",
+    "title": "News18 Bihar Jharkhand (1080p)",
+    "category": "News",
+    "manifest": "https://n18syndication.akamaized.net/bpk-tv/News18_Bihar_Jharkhand_NW18_MOB/output01/master.m3u8",
+    "thumbnail": "https://i.imgur.com/FQ3zDZE.png"
   },
   {
     "id": "News18DelhiNCRJK.in@SD",
@@ -2660,13 +2702,6 @@
     "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NEWS18_TAMIL_NADU/images/LOGO_HD/image.png"
   },
   {
-    "id": "News18Urdu.in@SD",
-    "title": "News18 Urdu (1080p)",
-    "category": "News",
-    "manifest": "https://n18syndication.akamaized.net/bpk-tv/News18_Urdu_NW18_MOB/output01/master.m3u8",
-    "thumbnail": "https://i.imgur.com/8xnwMRR.png"
-  },
-  {
     "id": "News18UttarPradeshUttarakhand.in@SD",
     "title": "News18 Uttar Pradesh Uttarakhand (1080p)",
     "category": "News",
@@ -2686,13 +2721,6 @@
     "category": "News",
     "manifest": "http://tv.balkanweb.com:8081/news24/livestream/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/eG33jue.png"
-  },
-  {
-    "id": "NewsCentral.ng@SD",
-    "title": "News Central",
-    "category": "News",
-    "manifest": "https://wf.newscentral.ng:8443/hls/stream.m3u8",
-    "thumbnail": "https://i.imgur.com/qvCgI8N.png"
   },
   {
     "id": "NewsDaily24.in@SD",
@@ -2784,6 +2812,13 @@
     "category": "News",
     "manifest": "https://videohd.live:19360/8076/8076.m3u8",
     "thumbnail": "https://i.ibb.co/2MNzXN7/Channels4-profile-9.jpg"
+  },
+  {
+    "id": "Noticias16.do@SD",
+    "title": "Noticias 16 (720p) [Not 24/7]",
+    "category": "News",
+    "manifest": "https://edge.essastream.com/noticias16/playlist.m3u8",
+    "thumbnail": ""
   },
   {
     "id": "Noticiero90Minutos.co@SD",
@@ -3024,13 +3059,6 @@
     "thumbnail": "https://jiotvimages.cdn.jio.com/dare_images/images/Prime_9_News.png"
   },
   {
-    "id": "PrimeNews.in@SD",
-    "title": "Prime News (576p)",
-    "category": "News",
-    "manifest": "https://mumt02.tangotv.in/PRIMENEWS/index.m3u8",
-    "thumbnail": "https://jiotvimages.cdn.jio.com/dare_images/images/Prime_News.png"
-  },
-  {
     "id": "PROTVChisinau.md@SD",
     "title": "PRO TV Chisinau (480p)",
     "category": "News",
@@ -3136,13 +3164,6 @@
     "thumbnail": "https://i.ibb.co/PDThYr5/Logo-Radio-Isla.png"
   },
   {
-    "id": "RadioUnoTacna.pe@SD",
-    "title": "Radio Uno Tacna (720p)",
-    "category": "News",
-    "manifest": "https://live-evg7.tv360.bitel.com.pe/bitel/radiounotv/playlist.m3u8",
-    "thumbnail": "https://i.imgur.com/PswowQP.png"
-  },
-  {
     "id": "NoticiasRCN.co@SD",
     "title": "RCN Noticias (720p)",
     "category": "News",
@@ -3176,6 +3197,13 @@
     "category": "News",
     "manifest": "https://rnw-rn.otteravision.com/rnw/rn/rnw_rn.m3u8",
     "thumbnail": "https://i.imgur.com/HZDRG0K.png"
+  },
+  {
+    "id": "RCR.pe@SD",
+    "title": "Red de Comunicación Regional (RCR) (720p) [Not 24/7]",
+    "category": "News",
+    "manifest": "https://5c3fb01839654.streamlock.net:1963/iptvrcrperu/livercrperutv/playlist.m3u8",
+    "thumbnail": "https://i.imgur.com/A8TRPrF.png"
   },
   {
     "id": "RedTVLebanon.lb@HD",
@@ -3218,6 +3246,13 @@
     "category": "News",
     "manifest": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicBharat.m3u8",
     "thumbnail": "https://dtil.tmsimg.com/assets/s143724_ld_h15_aa.png?lock=720x540"
+  },
+  {
+    "id": "RepublicKannada.in@SD",
+    "title": "Republic Kannada (1080p)",
+    "category": "News",
+    "manifest": "https://vg-republictvlive.akamaized.net/ptnr-republicweb/title-Republic_TV_Kannada/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/1acd1ce1-c6a7-4ae4-afa1-133ffb111ebb/main.m3u8",
+    "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_RSYMDOTKANNADA/images/LOGO_HD/image.png"
   },
   {
     "id": "RepublicTV.in@SD",
@@ -3269,25 +3304,11 @@
     "thumbnail": "https://i.imgur.com/DAK5ZnD.png"
   },
   {
-    "id": "RTArabic.ru@SD",
-    "title": "RT Arabic (1080p) [Geo-blocked]",
-    "category": "News",
-    "manifest": "https://rt-arb.rttv.com/dvr/rtarab/playlist.m3u8",
-    "thumbnail": "https://i.imgur.com/G8vGrn1.png"
-  },
-  {
     "id": "RTDE.de@SD",
     "title": "RT DE (1080p) [Not 24/7]",
     "category": "News",
     "manifest": "https://rt-ger.rttv.com/dvr/rtdeutsch/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/v1PIbB2.png"
-  },
-  {
-    "id": "RTFrance.fr@SD",
-    "title": "RT France (1080p) [Geo-blocked]",
-    "category": "News",
-    "manifest": "https://rt-fra.rttv.com/dvr/rtfrance/playlist.m3u8",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/RT-France-logo.svg/960px-RT-France-logo.svg.png"
   },
   {
     "id": "RTIndia.in@HD",
@@ -3463,13 +3484,6 @@
     "category": "News",
     "manifest": "https://telmaco-cdn.akamaized.net/starcgr/default/index.m3u8",
     "thumbnail": "https://i.imgur.com/ZBt6beo.png"
-  },
-  {
-    "id": "StartTV.gr@SD",
-    "title": "Start TV (480p)",
-    "category": "News",
-    "manifest": "https://live.cast-control.eu/StartMedia/StartMedia/playlist.m3u8",
-    "thumbnail": "https://i.ibb.co/4PrPG5j/Start-TV-Corfu-Radio-100-1-www-startmedia-gr-1.jpg"
   },
   {
     "id": "STZTV.br@SD",
@@ -3822,11 +3836,25 @@
     "thumbnail": "https://i.imgur.com/UWMHnOG.png"
   },
   {
+    "id": "TVLaCapitale.ci@SD",
+    "title": "TV La Capitale",
+    "category": "News",
+    "manifest": "https://stream.berosat.live:19360/tv-capitale-tream/tv-capitale-tream.m3u8",
+    "thumbnail": "https://i.imgur.com/zZJzNjM.jpeg"
+  },
+  {
     "id": "TVNatal.br@SD",
     "title": "TV Natal (1080p)",
     "category": "News - Entertainment",
     "manifest": "http://185.228.163.146:8000/play/a01y/index.m3u8",
     "thumbnail": "https://i.imgur.com/wqQmQml.png"
+  },
+  {
+    "id": "TVParaense.br@HD",
+    "title": "TV Paraense (720p)",
+    "category": "News - Entertainment",
+    "manifest": "https://video09.logicahost.com.br/tvparaense/tvparaense/playlist.m3u",
+    "thumbnail": "https://duckduckgo.com/i/e408ea02.png"
   },
   {
     "id": "TVSimCachoeiro.br@SD",
@@ -4193,6 +4221,13 @@
     "thumbnail": "https://i.imgur.com/z9t6x8B.png"
   },
   {
+    "id": "Millet.ru@SD",
+    "title": "Миллет (720p)",
+    "category": "News",
+    "manifest": "https://live1.1tvcrimea.ru/milletlive.m3u8",
+    "thumbnail": "https://i.imgur.com/hUjLRLy.png"
+  },
+  {
     "id": "Mir24.ru@SD",
     "title": "Мир 24 (1080p)",
     "category": "News",
@@ -4515,6 +4550,13 @@
     "thumbnail": "https://i.imgur.com/SbBKr8L.png"
   },
   {
+    "id": "BabyTime.ru@SD",
+    "title": "Baby Time",
+    "category": "Kids - Music",
+    "manifest": "http://89.218.32.179:18000/play/a028",
+    "thumbnail": "https://i.imgur.com/lW3WIBD.png"
+  },
+  {
     "id": "BabyFirst.us@Brazil",
     "title": "Babyfirst",
     "category": "Kids",
@@ -4604,6 +4646,13 @@
     "category": "Kids",
     "manifest": "http://bantel-cdn1.iptvperu.tv:1935/btnscrtn/canalinfantil/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/WGk7MJ3.png"
+  },
+  {
+    "id": "Carousel.ru@SD",
+    "title": "Carousel (1080p)",
+    "category": "Kids",
+    "manifest": "http://31.148.48.15/Karusel_HD/index.m3u8",
+    "thumbnail": "https://i.imgur.com/4wmnx1W.png"
   },
   {
     "id": "CCTV14.cn@HD",
@@ -4816,6 +4865,13 @@
     "thumbnail": "https://i.imgur.com/62oo8Bx.png"
   },
   {
+    "id": "ElChavoTV.mx@HD",
+    "title": "El Chavo TV (720p)",
+    "category": "Kids",
+    "manifest": "https://live20.bozztv.com/giatvplayout7/giatv-211465/playlist.m3u8",
+    "thumbnail": "https://gia.tv/streams/pptv/211465.png"
+  },
+  {
     "id": "ETV2.ee@SD",
     "title": "ETV2 (720p)",
     "category": "Kids - Culture",
@@ -4982,13 +5038,6 @@
     "category": "Movies - Kids",
     "manifest": "https://stream-us-east-1.getpublica.com/playlist.m3u8?network_id=50",
     "thumbnail": "https://i.imgur.com/4Pn0ADQ.png"
-  },
-  {
-    "id": "KiKA.de@SD",
-    "title": "KiKA (1080p) [Not 24/7]",
-    "category": "Kids",
-    "manifest": "https://kikahls.akamaized.net/hls/live/2022690/livetvkika_ww/master.m3u8",
-    "thumbnail": "https://i.imgur.com/vZdNp5S.png"
   },
   {
     "id": "KiKA.de@HD",
@@ -5318,13 +5367,6 @@
     "category": "Kids",
     "manifest": "https://jmp2.uk/plu-5f5c216df68f920007888315.m3u8",
     "thumbnail": "https://i.imgur.com/qoVxc13.png"
-  },
-  {
-    "id": "IRIBOmid.ir@SD",
-    "title": "Omid",
-    "category": "Kids",
-    "manifest": "https://ncdn.telewebion.ir/omid/live/playlist.m3u8",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/IRIB_Omid.svg/500px-IRIB_Omid.svg.png"
   },
   {
     "id": "PBSKids.us@SD",
@@ -6018,13 +6060,6 @@
     "category": "Kids",
     "manifest": "https://zoomoo-samsungau.amagi.tv/playlist.m3u8",
     "thumbnail": "https://i.imgur.com/ciTJrnl.png"
-  },
-  {
-    "id": "Mama.ru@SD",
-    "title": "Мама (576p)",
-    "category": "Kids",
-    "manifest": "http://31.148.48.15/Mama/index.m3u8",
-    "thumbnail": "https://i.imgur.com/kmMIjjf.png"
   },
   {
     "id": "Multimuzyka.ru@SD",
@@ -6755,6 +6790,13 @@
     "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/AXN_logo_%282015%29.svg/960px-AXN_logo_%282015%29.svg.png"
   },
   {
+    "id": "AXNMovies.es@SD",
+    "title": "AXN Movies (1080p)",
+    "category": "Movies",
+    "manifest": "https://adpnetworkhd-cmd.github.io/iptv/AXNMoviesSpain.m3u8",
+    "thumbnail": "https://static.wikia.nocookie.net/logopedia/images/d/d2/AXN_Movies_logo.svg/revision/latest/scale-to-width-down/512"
+  },
+  {
     "id": "B4UBhojpuri.in@SD",
     "title": "B4U Bhojpuri (1080p)",
     "category": "Movies",
@@ -7105,13 +7147,6 @@
     "thumbnail": "https://i.imgur.com/eLmdZ6k.png"
   },
   {
-    "id": "FilmBoxPremium.nl@RO",
-    "title": "FilmBox+ Hits [Not 24/7]",
-    "category": "Movies",
-    "manifest": "http://315e5a5d.ottrast.com/iptv/MM4E93NGF5LADZ/7043/index.m3u8",
-    "thumbnail": "https://i.imgur.com/RydfsE9.png"
-  },
-  {
     "id": "FilmesSuspense.us@Brazil",
     "title": "Filmes Suspense",
     "category": "Movies",
@@ -7264,6 +7299,13 @@
     "category": "Movies",
     "manifest": "https://stream.hrbtv.net/yspd/playlist.m3u8",
     "thumbnail": "https://www.tvchinese.net/uploads/tv/haerbin.jpg"
+  },
+  {
+    "id": "Hero.fi@SD",
+    "title": "Hero (720p) [Not 24/7]",
+    "category": "Movies",
+    "manifest": "https://live-fi.tvkaista.net/hero/live.m3u8?hd=true",
+    "thumbnail": "https://i.imgur.com/4t5JQLY.png"
   },
   {
     "id": "Hit.ru@HD",
@@ -7735,13 +7777,6 @@
     "thumbnail": "https://i.imgur.com/sj5h9bl.png"
   },
   {
-    "id": "ParamountNetwork.nl@SD",
-    "title": "Paramount Network [Not 24/7]",
-    "category": "Movies - Series",
-    "manifest": "http://315e5a5d.ottrast.com/iptv/MM4E93NGF5LADZ/12060/index.m3u8",
-    "thumbnail": "https://i.imgur.com/I0JJySN.png"
-  },
-  {
     "id": "ParamountNetwork.us@East",
     "title": "Paramount Network (720p)",
     "category": "Movies - Series",
@@ -7782,6 +7817,13 @@
     "category": "Movies",
     "manifest": "https://irhls.persiana.live/hls/stream.m3u8",
     "thumbnail": "https://i.imgur.com/vqrrpBi.png"
+  },
+  {
+    "id": "PersianaKorea.fr@SD",
+    "title": "Persiana Korea",
+    "category": "Movies",
+    "manifest": "https://korhls.persiana.live/hls/stream.m3u8",
+    "thumbnail": "https://i.imgur.com/si2ZnIA.png"
   },
   {
     "id": "PersianaLatino.fr@SD",
@@ -8953,6 +8995,13 @@
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
   },
   {
+    "id": "RakutenTVActionMovies.es@Germany",
+    "title": "Rakuten TV Action Movies Germany (1080p)",
+    "category": "Movies",
+    "manifest": "https://284824cf70404fdfb6ddf9349009c710.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6066/master.m3u8",
+    "thumbnail": "https://i.imgur.com/Meew6eX.png"
+  },
+  {
     "id": "RakutenTVActionMovies.es@Italy",
     "title": "Rakuten TV Action Movies Italy (1080p)",
     "category": "Movies",
@@ -8960,24 +9009,10 @@
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
   },
   {
-    "id": "RakutenTVActionMovies.es@Spain",
-    "title": "Rakuten TV Action Movies Spain (1080p)",
-    "category": "Movies",
-    "manifest": "https://a9c57ec7ec5e4b7daeacc6316a0bb404.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6069/master.m3u8",
-    "thumbnail": "https://i.imgur.com/Meew6eX.png"
-  },
-  {
     "id": "RakutenTVActionMovies.es@UK",
     "title": "Rakuten TV Action Movies UK (1080p)",
     "category": "Movies",
     "manifest": "https://54045f0c40fd442c8b06df076aaf1e85.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6065/master.m3u8",
-    "thumbnail": "https://i.imgur.com/Meew6eX.png"
-  },
-  {
-    "id": "RakutenTVComedyMovies.es@Finland",
-    "title": "Rakuten TV Comedy Movies Finland (1080p)",
-    "category": "Movies",
-    "manifest": "https://a300af98e00746e2acf2346f43e47bd1.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6191/master.m3u8",
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
   },
   {
@@ -9065,11 +9100,25 @@
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
   },
   {
+    "id": "RakutenTVFamilyMovies.es@Spain",
+    "title": "Rakuten TV Family Movies Spain (1080p)",
+    "category": "Movies - Family",
+    "manifest": "https://b0d59c8c98974e708e5ccb9a27cdfdfc.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6205/master.m3u8",
+    "thumbnail": "https://i.imgur.com/Meew6eX.png"
+  },
+  {
     "id": "RakutenTVFamilyMovies.es@UK",
     "title": "Rakuten TV Family Movies UK (1080p)",
     "category": "Movies - Family",
     "manifest": "https://e3207568b726401995c25670faaf32e4.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6203/master.m3u8",
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
+  },
+  {
+    "id": "RakutenTVNordicFilms.es@Finland",
+    "title": "Rakuten TV Nordic Films (1080p)",
+    "category": "Movies",
+    "manifest": "https://4aa9ef08b70d4b0c8f3519c5950b1930.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6303/master.m3u8",
+    "thumbnail": "https://images-3.rakuten.tv/storage/global-live-channel/translation/artwork/ff79e878-3eea-45fc-b0cd-55d6acce9b18-width200-quality90.jpeg"
   },
   {
     "id": "RakutenTVTopMovies.es@Finland",
@@ -9090,6 +9139,13 @@
     "title": "Rakuten TV Top Movies Italy (1080p)",
     "category": "Movies",
     "manifest": "https://d4a4999341764c67a67e9ec9eb3790ab.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5984/master.m3u8",
+    "thumbnail": "https://i.imgur.com/Meew6eX.png"
+  },
+  {
+    "id": "RakutenTVTopMovies.es@Spain",
+    "title": "Rakuten TV Top Movies Spain (1080p)",
+    "category": "Movies",
+    "manifest": "https://ff335120300e4742a2b135ee9a9e7df8.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5983/master.m3u8",
     "thumbnail": "https://i.imgur.com/Meew6eX.png"
   },
   {
@@ -9154,13 +9210,6 @@
     "category": "Movies - Classic",
     "manifest": "https://stream.smotrim.ru/hls/fasttv03/playlist_3.m3u8",
     "thumbnail": "https://i.imgur.com/aASNpKq.png"
-  },
-  {
-    "id": "SonyMoviesLatinAmerica.us@SD",
-    "title": "Sony Movies Latin America (720p)",
-    "category": "Movies",
-    "manifest": "https://cdn-5.nxplay.com.br/SONY_MOVIES/index.m3u8",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Sony_Movies_Logo.svg/500px-Sony_Movies_Logo.svg.png"
   },
   {
     "id": "SonyOneFavoris.fr@HD",
@@ -9261,13 +9310,6 @@
     "thumbnail": "https://i.imgur.com/4fMWhUE.png"
   },
   {
-    "id": "Tamasha.ir@SD",
-    "title": "Tamasha",
-    "category": "Movies",
-    "manifest": "https://ncdn.telewebion.ir/hdtest/live/playlist.m3u8",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/fa/thumb/f/f2/IRIB_tamashaTV.svg/960px-IRIB_tamashaTV.svg.png"
-  },
-  {
     "id": "ThalaaTV.in@HD",
     "title": "Thalaa TV (1080p)",
     "category": "Movies",
@@ -9331,11 +9373,32 @@
     "thumbnail": "https://i.imgur.com/OR9APjb.png"
   },
   {
-    "id": "ViasatSerial.ua@HD",
-    "title": "Viasat Serial (1080p) [Not 24/7]",
-    "category": "Movies - Series",
-    "manifest": "http://315e5a5d.ottrast.com/iptv/MM4E93NGF5LADZ/17056/index.m3u8",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Viasat_Serial.svg"
+    "id": "ViasatKino.ua@SD",
+    "title": "Viasat Kino [Not 24/7]",
+    "category": "Movies",
+    "manifest": "http://c3921155.edmonst.net/iptv/42L7TCH8YYKLBRHNPV52HBRN/31765/index.m3u8",
+    "thumbnail": "https://i.imgur.com/io0WAkA.png"
+  },
+  {
+    "id": "ViasatKinoAction.ua@SD",
+    "title": "Viasat Kino Action [Not 24/7]",
+    "category": "Movies",
+    "manifest": "http://315e5a5d.ottrast.com/iptv/8XFKA8883W9M5K/12024/index.m3u8",
+    "thumbnail": "https://i.imgur.com/HwsNIDK.png"
+  },
+  {
+    "id": "ViasatKinoComedy.ua@SD",
+    "title": "Viasat Kino Comedy [Not 24/7]",
+    "category": "Movies - Comedy",
+    "manifest": "http://c3921155.edmonst.net/iptv/42L7TCH8YYKLBRHNPV52HBRN/31764/index.m3u8",
+    "thumbnail": "https://i.imgur.com/qVYt8kP.png"
+  },
+  {
+    "id": "ViasatKinoWorld.ua@SD",
+    "title": "Viasat Kino World [Not 24/7]",
+    "category": "Movies",
+    "manifest": "http://c3921155.edmonst.net/iptv/42L7TCH8YYKLBRHNPV52HBRN/31448/index.m3u8",
+    "thumbnail": "https://i.imgur.com/GPiE2Rb.png"
   },
   {
     "id": "vijuTV1000action.ru@SD",
@@ -9343,13 +9406,6 @@
     "category": "Movies",
     "manifest": "https://stream8.cinerama.uz/1225/tracks-v1a1/mono.m3u8",
     "thumbnail": "https://i.imgur.com/TMmyuzh.png"
-  },
-  {
-    "id": "vijuTV1000russkoe.ru@SD",
-    "title": "viju TV1000 Русское (576p)",
-    "category": "Movies",
-    "manifest": "http://31.148.48.15/TV1000_Russkoe_kino/index.m3u8",
-    "thumbnail": "https://i.imgur.com/Meak2y4.png"
   },
   {
     "id": "WildSideTV.fr@SD",
@@ -9378,13 +9434,6 @@
     "category": "Movies",
     "manifest": "http://41.223.30.230/ZEEAFLAM/index.m3u8",
     "thumbnail": "https://i.imgur.com/ZxknutA.png"
-  },
-  {
-    "id": "ZeeCinema.in@UK",
-    "title": "Zee Cinema UK (576p)",
-    "category": "Movies",
-    "manifest": "http://41.223.30.230/ZEECINEMA/index.m3u8",
-    "thumbnail": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZEE_CINEMA/images/LOGO_HD/LOGO_HD_image.png"
   },
   {
     "id": "CineFriki.es@SD",
@@ -9457,13 +9506,6 @@
     "thumbnail": "https://i.imgur.com/zsCPLs4.png"
   },
   {
-    "id": "KinoTV.ru@SD",
-    "title": "КИНО ТВ (720p)",
-    "category": "Movies",
-    "manifest": "http://31.148.48.15/Kino_TV_HD/index.m3u8",
-    "thumbnail": "https://i.imgur.com/sMpamNO.png"
-  },
-  {
     "id": "Kinopokaz.ru@SD",
     "title": "Кинопоказ (576p)",
     "category": "Movies",
@@ -9504,13 +9546,6 @@
     "category": "Movies",
     "manifest": "https://cityeden.catcast.tv/content/34393/index.m3u8",
     "thumbnail": "https://i.imgur.com/gaket4B.png"
-  },
-  {
-    "id": "CityEdenKinoArt.ru@HD",
-    "title": "Сити Эдем КиноАрт [Not 24/7]",
-    "category": "Movies",
-    "manifest": "https://cityeden.catcast.tv/content/38398/index.m3u8",
-    "thumbnail": "https://i.imgur.com/67CWCtz.png"
   },
   {
     "id": "CityEdenKinoDetektiv.ru@HD",
