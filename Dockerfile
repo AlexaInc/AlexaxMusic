@@ -44,7 +44,7 @@ ENV PYTHONPATH=/app \
     XET_UPLOAD_BIN=/app/bin/xet-upload \
     WORK_DIR=/tmp/ytdl-work \
     DOWNLOAD_DIR=/tmp/downloads \
-    YTDL_RELAYS=""
+    YTDL_AUDIO_FORMAT=mp3
 
 # Fail the image build if the release or one of its required tools is unusable.
 RUN /app/bin/ytdl doctor > /tmp/ytdl-doctor.json \

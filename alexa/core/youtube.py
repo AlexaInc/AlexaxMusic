@@ -42,12 +42,28 @@ YTDL_BIN_DIR = os.getenv("YTDL_BIN_DIR") or str(Path(YTDL_BIN).parent)
 HF_TOKEN = os.getenv("HF_TOKEN", "")
 LOCAL_DISABLED = _env_bool("YTDL_DISABLE")
 DOWNLOAD_DIR = Path(os.getenv("DOWNLOAD_DIR", "downloads"))
-# Relays are optional. There is deliberately no third-party relay enabled by default.
-RELAYS = [
-    relay.strip().rstrip("/")
-    for relay in os.getenv("YTDL_RELAYS", "").split(",")
-    if relay.strip()
-]
+AUDIO_FORMAT = os.getenv("YTDL_AUDIO_FORMAT") or os.getenv("AUDIO_FORMAT") or "native"
+RETRY_CLIENTS = os.getenv("YTDL_RETRY_CLIENTS", "default,android,mweb")
+FORMAT_RETRY = _env_bool("YTDL_FORMAT_RETRY", True)
+COOKIELESS_RETRY = _env_bool("YTDL_COOKIELESS_RETRY", True)
+
+# Match the proven alexa-v3 fallback chain. Set YTDL_RELAYS=none to force
+# local-only mode; an empty value uses these compatible services.
+_DEFAULT_RELAYS = (
+    "https://absolute-vonnie-alexainc-ec756816.koyeb.app,"
+    "https://hansaka1-ytdl.hf.space,"
+    "https://cold-lemming-3841.alexainc.deno.net"
+)
+_relay_setting = os.getenv("YTDL_RELAYS", "").strip()
+if _relay_setting.lower() in {"none", "off", "disabled", "0"}:
+    RELAYS = []
+else:
+    RELAYS = [
+        relay.strip().rstrip("/")
+        for relay in (_relay_setting or _DEFAULT_RELAYS).split(",")
+        if relay.strip()
+    ]
+
 RELAY_KEY = os.getenv("YTDL_RELAY_KEY", "")
 MAX_CONCURRENT = _env_int("YTDL_CONCURRENCY", 1, 1)
 COMMAND_TIMEOUT = _env_int("YTDL_COMMAND_TIMEOUT", 900, 30)
@@ -56,6 +72,10 @@ BOTCHECK_BACKOFF = _env_int("YTDL_BOTCHECK_BACKOFF", 15 * 60, 0)
 _VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
 _AUDIO_EXTENSIONS = {"m4a", "mp3", "opus", "webm"}
 _VIDEO_EXTENSIONS = {"mp4"}
+_FORMAT_ERROR = re.compile(
+    r"requested format is not available|only images are available|no video formats found",
+    re.IGNORECASE,
+)
 
 HEADERS = {
     "accept": "*/*",
@@ -64,17 +84,26 @@ HEADERS = {
 }
 
 
-def _child_env() -> dict:
+def _child_env(overrides: Optional[dict[str, str]] = None) -> dict:
     """Build the environment consumed by the pinned ytdlgo CLI."""
     env = dict(os.environ)
     if YTDL_BIN_DIR:
         env["PATH"] = f"{YTDL_BIN_DIR}:{env.get('PATH', '')}"
     env.setdefault("WORK_DIR", "/tmp/ytdl-work")
 
+    # Use the same public variable names as alexa-v3 while translating them to
+    # the names consumed by the ytdlgo 1.0.0 release.
+    env["AUDIO_FORMAT"] = AUDIO_FORMAT
+    if env.get("YTDL_MAX_HEIGHT"):
+        env["MAX_HEIGHT"] = env["YTDL_MAX_HEIGHT"]
+
     # Backward compatibility with this project's old, space-separated variable.
     # ytdlgo itself consumes COOKIES_URLS (comma/newline separated).
     if not env.get("COOKIES_URLS") and env.get("COOKIES_URL"):
         env["COOKIES_URLS"] = ",".join(env["COOKIES_URL"].split())
+
+    if overrides:
+        env.update({key: str(value) for key, value in overrides.items()})
     return env
 
 
@@ -187,7 +216,12 @@ class YouTube:
         return tracks
 
     # ------------------------------------------------------------- ytdl CLI
-    async def _run_ytdl(self, *args: str, timeout: Optional[int] = None) -> dict:
+    async def _run_ytdl(
+        self,
+        *args: str,
+        timeout: Optional[int] = None,
+        env_overrides: Optional[dict[str, str]] = None,
+    ) -> dict:
         """Run the pinned ytdlgo CLI and return its final JSON response."""
         if not args:
             raise ValueError("a ytdl command is required")
@@ -196,7 +230,7 @@ class YouTube:
             proc = await asyncio.create_subprocess_exec(
                 YTDL_BIN,
                 *args,
-                env=_child_env(),
+                env=_child_env(env_overrides),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -243,11 +277,15 @@ class YouTube:
                     if not self._local_ok:
                         raise RuntimeError("doctor reports missing yt-dlp or ffmpeg")
                     logger.info(
-                        "[ytdl] ytdlgo %s ready: yt-dlp=%s bucket=%s cookies=%d",
+                        "[ytdl] ytdlgo %s ready: yt-dlp=%s bucket=%s cookies=%d "
+                        "format=%s clients=%s relays=%d",
                         YTDLGO_VERSION,
                         doctor.get("ytdlp"),
                         doctor.get("bucket") or "local-only",
                         len(doctor.get("cookies") or []),
+                        doctor.get("format") or AUDIO_FORMAT,
+                        ",".join(doctor.get("clients") or []),
+                        len(RELAYS),
                     )
                 except Exception as exc:
                     logger.error("[ytdl] ytdlgo doctor failed: %s", exc)
@@ -287,9 +325,59 @@ class YouTube:
             raise RuntimeError(f"ytdl returned unsupported extension: {extension}")
         return extension
 
+    async def _get_local_result(self, video_id: str, video: bool) -> dict:
+        """Download through ytdlgo, retrying format/cookie edge cases."""
+        args = ("get", video_id, "--type", "video" if video else "audio")
+        try:
+            return await self._run_ytdl(*args)
+        except RuntimeError as first_error:
+            message = str(first_error)
+            format_error = bool(_FORMAT_ERROR.search(message))
+            bot_error = any(
+                marker in message.lower()
+                for marker in ("sign in", "not a bot", "login_required", "cookies")
+            )
+            if not format_error and not bot_error:
+                raise
+
+            attempts: list[tuple[str, dict[str, str]]] = []
+            fallback_format = "mp3" if AUDIO_FORMAT != "mp3" else "native"
+            if format_error and FORMAT_RETRY:
+                overrides = {"YT_CLIENTS": RETRY_CLIENTS}
+                if not video:
+                    overrides["AUDIO_FORMAT"] = fallback_format
+                label = (
+                    f"alternate client/format ({fallback_format})"
+                    if not video
+                    else "alternate clients"
+                )
+                attempts.append((label, overrides))
+            if COOKIELESS_RETRY:
+                overrides = {
+                    "COOKIES_URLS": "",
+                    "COOKIES_URL": "",
+                    "YT_CLIENTS": RETRY_CLIENTS,
+                }
+                if not video:
+                    overrides["AUDIO_FORMAT"] = fallback_format
+                attempts.append(("cookie-less ytdlgo", overrides))
+
+            last_error = first_error
+            for label, overrides in attempts:
+                logger.warning("[ytdl] %s failed for %s; retrying with %s", message, video_id, label)
+                try:
+                    return await self._run_ytdl(*args, env_overrides=overrides)
+                except RuntimeError as retry_error:
+                    last_error = retry_error
+                    logger.warning("[ytdl] %s retry failed for %s: %s", label, video_id, retry_error)
+
+            if last_error is first_error:
+                raise
+            raise RuntimeError(f"{message}; retry failed: {last_error}") from last_error
+
     async def _download_local(self, video_id: str, video: bool) -> Path:
         # ytdlgo checks the HF bucket cache, runs yt-dlp when needed, then returns JSON.
-        result = await self._run_ytdl("get", video_id, "--type", "video" if video else "audio")
+        result = await self._get_local_result(video_id, video)
         extension = self._extension(result.get("ext"), video)
         dest = DOWNLOAD_DIR / f"{video_id}.{extension}"
         local = result.get("local")
