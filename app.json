@@ -1,5 +1,5 @@
 {
-    "name": "AnonX Music",
+    "name": "Alexa Music",
     "description": "A Telegram Music Player Bot, written in Python with Pyrogram and Py-Tgcalls.",
     "logo": "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
     "keywords": ["python3", "telegram", "bot", "music-bot"],
@@ -24,6 +24,11 @@
             "description": "Get a mongodb url from https://cloud.mongodb.com.",
             "value": "",
             "required": true
+        },
+        "MONGO_DB_NAME": {
+            "description": "MongoDB database name used by Alexa Music.",
+            "value": "Alexa",
+            "required": false
         },
         "LOGGER_ID": {
             "description": "Your log group ID, add your bot there and promote as an admin.",

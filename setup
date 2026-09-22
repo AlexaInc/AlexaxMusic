@@ -61,12 +61,31 @@ install_deno() {
     fi
 }
 
+install_ytdlgo() {
+    pprint "\n\nInstalling ytdlgo 1.0.0...\n" "cblue"
+    if ./scripts/install_ytdlgo.sh "$PWD/bin" \
+        && curl -fsSL --retry 5 \
+            https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+            -o "$PWD/bin/yt-dlp" \
+        && chmod 755 "$PWD/bin/yt-dlp"; then
+        ln -sf "$(command -v ffmpeg)" "$PWD/bin/ffmpeg"
+        command -v ffprobe >/dev/null && ln -sf "$(command -v ffprobe)" "$PWD/bin/ffprobe"
+        command -v deno >/dev/null && ln -sf "$(command -v deno)" "$PWD/bin/deno"
+        PATH="$PWD/bin:$PATH" YTDLP_BIN="$PWD/bin/yt-dlp" "$PWD/bin/ytdl" doctor
+        pprint "ytdlgo installed and verified.\n" "cgreen"
+    else
+        pprint "ytdlgo installation failed.\n" "cred"
+        exit 1
+    fi
+}
+
 install_py() {
     pprint "\n\nInstalling Python dependencies...\n"
     if pip3 install -U pip -q && pip3 install -U -r requirements.txt -q; then
         pprint "Done.\n" "cgreen"
     else
-        pprint "Failed (continuing...)\n" "cred"
+        pprint "Failed.\n" "cred"
+        exit 1
     fi
 }
 
@@ -78,24 +97,41 @@ API_ID=$1
 API_HASH=$2
 BOT_TOKEN=$3
 MONGO_URL=$4
+MONGO_DB_NAME=Alexa
 LOGGER_ID=$5
 SESSION=$6
 OWNER_ID=$7
+
+# AlexaInc/ytdlgo 1.0.0 (installed by this setup script)
+YTDL_BIN=$PWD/bin/ytdl
+YTDL_BIN_DIR=$PWD/bin
+YTDLP_BIN=$PWD/bin/yt-dlp
+DENO_BIN=$PWD/bin/deno
+FFMPEG_BIN=$PWD/bin/ffmpeg
+XET_UPLOAD_BIN=$PWD/bin/xet-upload
+YTDL_DISABLE=0
+YTDL_CONCURRENCY=1
+YTDL_RELAYS=
+DOWNLOAD_DIR=downloads
+WORK_DIR=/tmp/ytdl-work
+AUDIO_FORMAT=native
 EOF
 }
 
 
 clear
-pprint "Welcome to the AnonXMusic Installation Setup\n\n" "cmagenta"
+pprint "Welcome to the Alexa Music Installation Setup\n\n" "cmagenta"
 sleep 1
 
 update
 install_pkg python3-pip python3-pip
-install_pkg ffmpeg ffmpeg unzip
+install_pkg ffmpeg ffmpeg
+install_pkg unzip unzip
 install_deno
+install_ytdlgo
 install_py
 
-pprint "\nAnonXMusic Installation Completed.\n" "cgreen"
+pprint "\nAlexa Music Installation Completed.\n" "cgreen"
 sleep 2
 clear
 

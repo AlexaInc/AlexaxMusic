@@ -15,7 +15,7 @@ M3U_URLS = [
     "https://iptv-org.github.io/iptv/categories/kids.m3u",
     "https://iptv-org.github.io/iptv/categories/animation.m3u",
     "https://iptvmate.net/files/adult.m3u",
-    "anony/helpers/adult.m3u",
+    "alexa/helpers/adult.m3u",
     "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/action-movies.m3u",
     "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/animation-movies.m3u",
     "https://aymrgknetzpucldhpkwm.supabase.co/storage/v1/object/public/tmdb/science-fiction-movies.m3u",

@@ -1,7 +1,7 @@
 import asyncio
-from anony import anon
+from alexa import player
 from pytgcalls import types
-from anony.helpers._dataclass import Track
+from alexa.helpers._dataclass import Track
 from unittest.mock import AsyncMock, MagicMock
 
 async def main():
@@ -31,15 +31,15 @@ async def main():
         
     import pytgcalls.types.stream.media_stream
     pytgcalls.types.stream.media_stream.MediaStream = mock_ms
-    import anony.core.calls
-    anony.core.calls.types.MediaStream = mock_ms
+    import alexa.core.calls
+    alexa.core.calls.types.MediaStream = mock_ms
 
     msg = MagicMock()
     msg.edit_text = AsyncMock()
 
     # Mock client play
     try:
-        await anon.play_media(chat_id=123, message=msg, media=media_obj)
+        await player.play_media(chat_id=123, message=msg, media=media_obj)
     except Exception as e:
         print("Caught exception or aborted:", type(e))
 

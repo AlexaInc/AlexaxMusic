@@ -6,6 +6,14 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+
+def env_bool(name: str, default: bool = False) -> bool:
+    value = getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 class Config:
     def __init__(self):
         self.PORT = int(getenv("PORT", 7860))
@@ -14,6 +22,7 @@ class Config:
 
         self.BOT_TOKEN = getenv("BOT_TOKEN")
         self.MONGO_URL = getenv("MONGO_URL")
+        self.MONGO_DB_NAME = getenv("MONGO_DB_NAME", "Alexa")
 
         self.LOGGER_ID = int(getenv("LOGGER_ID", 0))
         self.OWNER_ID = int(getenv("OWNER_ID", 0))
@@ -29,13 +38,14 @@ class Config:
         self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/AlexaInc_updates")
         self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/+_9LokVOOdrdlOGQ1")
 
-        self.AUTO_END: bool = getenv("AUTO_END", False)
-        self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", False)
-        self.VIDEO_PLAY: bool = getenv("VIDEO_PLAY", True)
-        self.COOKIES_URL = [
-            url for url in getenv("COOKIES_URL", "").split(" ")
-            if url and "batbin.me" in url
-        ]
+        self.AUTO_END = env_bool("AUTO_END", False)
+        self.AUTO_LEAVE = env_bool("AUTO_LEAVE", False)
+        self.VIDEO_PLAY = env_bool("VIDEO_PLAY", True)
+
+        # Legacy compatibility only. New deployments should use COOKIES_URLS,
+        # which is consumed directly by the ytdlgo 1.0.0 binary.
+        legacy_cookie_urls = getenv("COOKIES_URL", "").replace(",", " ")
+        self.COOKIES_URL = [url for url in legacy_cookie_urls.split() if url]
         self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://te.legra.ph/file/3e40a408286d4eda24191.jpg")
         self.PING_IMG = getenv("PING_IMG", "https://files.catbox.moe/haagg2.png")
         self.START_IMG = getenv("START_IMG", "https://files.catbox.moe/zvziwk.jpg")

@@ -1,75 +1,68 @@
 FROM python:3.11-slim-bookworm
 
-# 1. Set Working Directory
+ARG TARGETARCH=amd64
+ARG YTDLGO_VERSION=1.0.0
+
 WORKDIR /app
 
-# 2. Install System Dependencies
-RUN apt-get update -y && apt-get upgrade -y \
+# ytdlgo invokes yt-dlp, Deno and ffmpeg; Python build tools cover wheels that
+# are unavailable on a deployment platform.
+RUN test "$TARGETARCH" = "amd64" \
+    || (echo "AlexaInc/ytdlgo 1.0.0 only publishes amd64 binaries" >&2; exit 1) \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
-    ffmpeg curl unzip git gcc python3-dev ca-certificates xz-utils \
-    && apt-get clean \
+       ca-certificates curl unzip ffmpeg gcc python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install Deno (needed by yt-dlp >= 2026 for YouTube JS challenges)
-RUN curl -fsSL https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -o /tmp/deno.zip \
-    && unzip -q /tmp/deno.zip -d /usr/local/bin && chmod 755 /usr/local/bin/deno && rm /tmp/deno.zip
+# Deno is used by current yt-dlp releases for YouTube JavaScript challenges.
+RUN curl -fsSL --retry 5 \
+      https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip \
+      -o /tmp/deno.zip \
+    && unzip -q /tmp/deno.zip -d /usr/local/bin \
+    && chmod 0755 /usr/local/bin/deno \
+    && rm /tmp/deno.zip
 
-# 4. Create User (Standard for Choreo/Cloud Run)
-RUN useradd -m -u 10014 choreouser
+# Install and checksum-verify the requested ytdlgo release assets.
+COPY scripts/install_ytdlgo.sh /usr/local/bin/install-ytdlgo
+RUN YTDLGO_VERSION="$YTDLGO_VERSION" /usr/local/bin/install-ytdlgo /app/bin \
+    && curl -fsSL --retry 5 \
+       https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+       -o /app/bin/yt-dlp \
+    && chmod 0755 /app/bin/yt-dlp \
+    && ln -s /usr/local/bin/deno /app/bin/deno \
+    && ln -s /usr/bin/ffmpeg /app/bin/ffmpeg \
+    && ln -s /usr/bin/ffprobe /app/bin/ffprobe
 
-# 5. Clone the Repository
-RUN git clone https://github.com/AlexaInc/AlexaxMusic.git /tmp/alexa \
-    && mv /tmp/alexa/* . \
-    && rm -rf /tmp/alexa
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/bin:${PATH}" \
+    YTDL_BIN=/app/bin/ytdl \
+    YTDL_BIN_DIR=/app/bin \
+    YTDLP_BIN=/app/bin/yt-dlp \
+    DENO_BIN=/app/bin/deno \
+    FFMPEG_BIN=/app/bin/ffmpeg \
+    XET_UPLOAD_BIN=/app/bin/xet-upload \
+    WORK_DIR=/tmp/ytdl-work \
+    DOWNLOAD_DIR=/tmp/downloads \
+    YTDL_RELAYS=""
 
-# ----------------------------------------------------------------------
-# 5b. ytdl toolchain -> /app/bin  (ytdl + xet-upload from AlexaInc/ytdlgo release, yt-dlp_linux)
-#     youtube.py looks for <project>/bin/ytdl by default and prepends /app/bin to PATH.
-# ----------------------------------------------------------------------
-ARG YTDLGO_VERSION=1.0.0
-RUN mkdir -p /app/bin \
-    && curl -fsSL -o /app/bin/ytdl       https://github.com/AlexaInc/ytdlgo/releases/download/${YTDLGO_VERSION}/ytdl \
-    && curl -fsSL -o /app/bin/xet-upload https://github.com/AlexaInc/ytdlgo/releases/download/${YTDLGO_VERSION}/xet-upload \
-    && curl -fsSL -o /app/bin/yt-dlp     https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
-    && ln -sf /usr/local/bin/deno /app/bin/deno \
-    && ln -sf /usr/bin/ffmpeg  /app/bin/ffmpeg \
-    && ln -sf /usr/bin/ffprobe /app/bin/ffprobe \
-    && chmod 755 /app/bin/* \
-    && /app/bin/ytdl doctor || true
+# Fail the image build if the release or one of its required tools is unusable.
+RUN /app/bin/ytdl doctor > /tmp/ytdl-doctor.json \
+    && cat /tmp/ytdl-doctor.json \
+    && python -c 'import json; d=json.load(open("/tmp/ytdl-doctor.json")); assert d.get("ok") and d.get("ytdlp") and d.get("ffmpeg") and d.get("xet_upload"), d'
 
-# 6. Install Python Requirements
-RUN pip3 install --no-cache-dir -U pip \
-    && pip3 install --no-cache-dir -U -r requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --requirement requirements.txt
 
-# 7. Environment Variables
-ENV PYTHONPATH="/app"
-ENV PYTHONUNBUFFERED=1
-ENV PATH="/app/bin:${PATH}"
-# ytdl runtime (secrets HF_TOKEN / COOKIES_URLS come from the platform's env, not the image)
-ENV YTDL_BIN=/app/bin/ytdl
-ENV YTDL_BIN_DIR=/app/bin
-ENV HF_BUCKET=hazu165/songs
-ENV WORK_DIR=/tmp/ytdl-work
-ENV DOWNLOAD_DIR=/tmp/downloads
-ENV YTDL_RELAYS=https://absolute-vonnie-alexainc-ec756816.koyeb.app
+# Build the checked-out project (including local changes); do not clone master
+# from inside the image and accidentally discard those changes.
+COPY . .
 
-# ----------------------------------------------------------------------
-# FIX 1: LOG FILE HACK (Redirecting writes to /tmp for Read-Only FS)
-# ----------------------------------------------------------------------
-RUN if [ -f anony/__init__.py ]; then \
-    sed -i 's/"log.txt"/"\/tmp\/log.txt"/g' anony/__init__.py; \
-    fi
+RUN useradd --create-home --uid 10014 choreouser \
+    && mkdir -p "$WORK_DIR" "$DOWNLOAD_DIR" \
+    && chown -R 10014:10014 /app "$WORK_DIR" "$DOWNLOAD_DIR"
 
-# ----------------------------------------------------------------------
-# FIX 2: EXPOSE A PORT
-# ----------------------------------------------------------------------
-EXPOSE 7860
-
-# 8. Grant Permissions to the specific user
-RUN chown -R 10014:10014 /app
-
-# 9. Switch User
 USER 10014
-
-# 10. Start Bot
-CMD ["python3", "-m", "anony"]
+EXPOSE 7860
+CMD ["python3", "-m", "alexa"]

@@ -4,7 +4,7 @@ import json
 import subprocess
 
 async def main():
-    with open("anony/helpers/channels.json", "r", encoding="utf-8") as f:
+    with open("alexa/helpers/channels.json", "r", encoding="utf-8") as f:
         channels = json.load(f)
     channel = channels[0]
     
