@@ -341,14 +341,17 @@ class YouTube:
                 raise
 
             attempts: list[tuple[str, dict[str, str]]] = []
-            fallback_format = "mp3" if AUDIO_FORMAT != "mp3" else "native"
+            # native uses a stricter m4a-first selector, so MP3 is a useful
+            # broad-format fallback. Explicit MP3/Opus requests already use the
+            # broad selector and must keep the configured output format.
+            fallback_format = "mp3" if AUDIO_FORMAT == "native" else AUDIO_FORMAT
             if format_error and FORMAT_RETRY:
                 overrides = {"YT_CLIENTS": RETRY_CLIENTS}
                 if not video:
                     overrides["AUDIO_FORMAT"] = fallback_format
                 label = (
                     f"alternate client/format ({fallback_format})"
-                    if not video
+                    if not video and fallback_format != AUDIO_FORMAT
                     else "alternate clients"
                 )
                 attempts.append((label, overrides))

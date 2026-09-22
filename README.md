@@ -69,6 +69,6 @@ The local ytdlgo backend needs no storage account. Leave `HF_BUCKET` and `HF_TOK
 
 The default relay chain matches `AlexaInc/alexa-v3`. Set `YTDL_RELAYS=none` for local-only operation. If a relay has `RELAY_SECRET`, set the same value as `YTDL_RELAY_KEY` in this bot.
 
-For compatibility with videos that expose only combined formats, the Docker image defaults to `YTDL_AUDIO_FORMAT=mp3`. A `Requested format is not available` response is retried through ytdlgo with alternate clients/format, then without remote cookies, before the relay chain is used.
+For compatibility with videos that expose only combined formats, the Docker image defaults to `YTDL_AUDIO_FORMAT=mp3`. A `Requested format is not available` response is retried through ytdlgo with alternate clients, then without remote cookies, before the relay chain is used. Explicit `mp3` or `opus` output settings are preserved during retries; only `native` may fall back to MP3.
 
 Only download media you are authorized to access, and follow the source platform's terms and applicable law.
