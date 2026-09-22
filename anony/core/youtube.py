@@ -1,20 +1,4 @@
-# Copyright (c) 2025 AnonymousX1025
-# Licensed under the MIT License.
-# This file is part of AnonXMusic
-#
-# YouTube platform module
-#   search   -> hansaka1-ytdl.hf.space/search   (unchanged)
-#   playlist -> py_yt                            (unchanged)
-#   download -> tier 1: local `ytdl` Go CLI (bin/ytdl, yt-dlp + cookies + HF bucket cache)
-#               tier 2: Koyeb ytdl-go relay (POST /convert)
-#
-# Env (all optional except HF_TOKEN/HF_BUCKET/COOKIES_URLS for tier 1):
-#   YTDL_BIN        path to the ytdl binary        default: <project>/bin/ytdl
-#   YTDL_BIN_DIR    dir prepended to PATH          default: dirname(YTDL_BIN)  (yt-dlp_linux, deno, ffmpeg, xet-upload)
-#   HF_TOKEN, HF_BUCKET, COOKIES_URLS, AUDIO_FORMAT, MAX_HEIGHT, WORK_DIR   -> passed through to ytdl
-#   YTDL_RELAYS     comma-separated relay base URLs  default: Koyeb
-#   YTDL_DISABLE=1  skip local binary, relay only
-#   DOWNLOAD_DIR    where finished files go        default: downloads
+
 
 import os
 import re
@@ -32,7 +16,7 @@ from anony import config, logger
 from anony.helpers import Track, utils
 
 # ----------------------------------------------------------------- config
-_PROJECT = Path(__file__).resolve().parents[2]  # .../anony/platforms/youtube.py -> project root
+_PROJECT = Path(__file__).resolve().parents[2] 
 YTDL_BIN = os.getenv("YTDL_BIN") or str(_PROJECT / "bin" / "ytdl")
 YTDL_BIN_DIR = os.getenv("YTDL_BIN_DIR") or str(Path(YTDL_BIN).parent)
 HF_TOKEN = os.getenv("HF_TOKEN", "")
