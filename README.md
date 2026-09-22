@@ -9,7 +9,7 @@ Every YouTube audio/video download now goes through one of these ytdlgo paths:
 1. **Local (default):** `bin/ytdl get <video-id> --type audio|video`
 2. **Optional relay:** ytdlgo's `POST /convert` API, configured with `YTDL_RELAYS`
 
-There is no direct Python `yt-dlp` download fallback. The ytdlgo release invokes `yt-dlp`, Deno, and ffmpeg as its own toolchain. The Docker image downloads the exact `ytdl` and `xet-upload` 1.0.0 assets and verifies their published SHA-256 digests before building.
+The pinned ytdlgo release remains the primary downloader. If it reports no selectable format, a final local CLI fallback asks `yt-dlp` for `ba/b` (best audio, otherwise best combined format) and converts it with ffmpeg to the configured output. The Docker image downloads the exact `ytdl` and `xet-upload` 1.0.0 assets and verifies their published SHA-256 digests before building.
 
 ## Docker deployment (recommended)
 
@@ -69,6 +69,6 @@ The local ytdlgo backend needs no storage account. Leave `HF_BUCKET` and `HF_TOK
 
 The default relay chain matches `AlexaInc/alexa-v3`. Set `YTDL_RELAYS=none` for local-only operation. If a relay has `RELAY_SECRET`, set the same value as `YTDL_RELAY_KEY` in this bot.
 
-For compatibility with videos that expose only combined formats, the Docker image defaults to `YTDL_AUDIO_FORMAT=mp3`. A `Requested format is not available` response is retried through ytdlgo with alternate clients, then without remote cookies, before the relay chain is used. Explicit `mp3` or `opus` output settings are preserved during retries; only `native` may fall back to MP3.
+For compatibility with videos that expose only combined formats, the Docker image defaults to `YTDL_AUDIO_FORMAT=mp3`. A `Requested format is not available` response now triggers `ba/b` best-available download plus ffmpeg conversion first. If that fails, alternate ytdlgo clients, a cookie-less ytdlgo attempt, and finally the relay chain are tried. Explicit `mp3` or `opus` output settings and `AUDIO_BITRATE` are preserved; only `native` may normalize to M4A or fall back to MP3.
 
 Only download media you are authorized to access, and follow the source platform's terms and applicable law.

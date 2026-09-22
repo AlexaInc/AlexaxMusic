@@ -112,6 +112,7 @@ XET_UPLOAD_BIN=$PWD/bin/xet-upload
 YTDL_DISABLE=0
 YTDL_CONCURRENCY=1
 YTDL_RELAYS=https://absolute-vonnie-alexainc-ec756816.koyeb.app,https://hansaka1-ytdl.hf.space,https://cold-lemming-3841.alexainc.deno.net
+YTDL_DIRECT_FALLBACK=true
 YTDL_FORMAT_RETRY=true
 YTDL_COOKIELESS_RETRY=true
 YTDL_RETRY_CLIENTS=default,android,mweb

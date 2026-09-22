@@ -5,6 +5,7 @@ import re
 import json
 import shutil
 import asyncio
+import tempfile
 from urllib.parse import urljoin, urlparse
 
 import aiohttp
@@ -43,9 +44,15 @@ HF_TOKEN = os.getenv("HF_TOKEN", "")
 LOCAL_DISABLED = _env_bool("YTDL_DISABLE")
 DOWNLOAD_DIR = Path(os.getenv("DOWNLOAD_DIR", "downloads"))
 AUDIO_FORMAT = os.getenv("YTDL_AUDIO_FORMAT") or os.getenv("AUDIO_FORMAT") or "native"
+AUDIO_BITRATE = os.getenv("AUDIO_BITRATE", "128k")
+YTDLP_BIN = os.getenv("YTDLP_BIN", "yt-dlp")
+FFMPEG_BIN = os.getenv("FFMPEG_BIN", "ffmpeg")
+MAX_HEIGHT = _env_int("MAX_HEIGHT", 720, 144)
+MAX_DURATION = _env_int("MAX_DURATION_SEC", 3600, 0)
 RETRY_CLIENTS = os.getenv("YTDL_RETRY_CLIENTS", "default,android,mweb")
 FORMAT_RETRY = _env_bool("YTDL_FORMAT_RETRY", True)
 COOKIELESS_RETRY = _env_bool("YTDL_COOKIELESS_RETRY", True)
+DIRECT_FALLBACK = _env_bool("YTDL_DIRECT_FALLBACK", True)
 
 # Match the proven alexa-v3 fallback chain. Set YTDL_RELAYS=none to force
 # local-only mode; an empty value uses these compatible services.
@@ -325,6 +332,117 @@ class YouTube:
             raise RuntimeError(f"ytdl returned unsupported extension: {extension}")
         return extension
 
+    async def _download_best_available(self, video_id: str, video: bool) -> dict:
+        """Use yt-dlp's broadest selector and let ffmpeg normalize the result.
+
+        This is only reached after the pinned ytdlgo release reports that its
+        selected format is unavailable. It intentionally runs without remote
+        cookies so a stale account session cannot hide otherwise public formats.
+        """
+        work_root = Path(_child_env()["WORK_DIR"])
+        work_root.mkdir(parents=True, exist_ok=True)
+        job_dir = Path(tempfile.mkdtemp(prefix=f"{video_id}_best_", dir=work_root))
+        output = job_dir / f"{video_id}.%(ext)s"
+
+        args = [
+            YTDLP_BIN,
+            "--ignore-config",
+            "--no-warnings",
+            "--no-playlist",
+            "--no-progress",
+            "--no-cache-dir",
+            "--retries",
+            "3",
+            "--fragment-retries",
+            "3",
+            "--extractor-retries",
+            "3",
+            "--socket-timeout",
+            "30",
+            "--geo-bypass",
+            "--no-check-certificates",
+            "--concurrent-fragments",
+            "1",
+            "--js-runtimes",
+            "deno",
+            "--ffmpeg-location",
+            FFMPEG_BIN,
+            "--force-overwrites",
+            "-o",
+            str(output),
+        ]
+        if MAX_DURATION > 0:
+            args.extend(["--match-filter", f"duration<={MAX_DURATION}"])
+
+        if video:
+            args.extend(
+                [
+                    "-f",
+                    f"b[height<={MAX_HEIGHT}]/bv*[height<={MAX_HEIGHT}]+ba/b",
+                    "--merge-output-format",
+                    "mp4",
+                    "--recode-video",
+                    "mp4",
+                    "--postprocessor-args",
+                    "ffmpeg:-threads 1",
+                ]
+            )
+            target_ext = "mp4"
+        else:
+            target_ext = AUDIO_FORMAT if AUDIO_FORMAT in {"mp3", "opus"} else "m4a"
+            quality = AUDIO_BITRATE if target_ext in {"mp3", "opus"} else "0"
+            args.extend(
+                [
+                    "-f",
+                    "ba/b",
+                    "-x",
+                    "--audio-format",
+                    target_ext,
+                    "--audio-quality",
+                    quality,
+                    "--postprocessor-args",
+                    "ffmpeg:-threads 1",
+                ]
+            )
+        args.append(self.base + video_id)
+
+        env = _child_env({"COOKIES_URLS": "", "COOKIES_URL": ""})
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *args,
+                env=env,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            try:
+                _, stderr = await asyncio.wait_for(process.communicate(), timeout=COMMAND_TIMEOUT)
+            except asyncio.TimeoutError as exc:
+                process.kill()
+                await process.communicate()
+                raise RuntimeError("best-format yt-dlp fallback timed out") from exc
+
+            expected = job_dir / f"{video_id}.{target_ext}"
+            if process.returncode != 0 or not expected.is_file() or expected.stat().st_size == 0:
+                detail = stderr.decode(errors="replace").strip().splitlines()
+                raise RuntimeError(detail[-1] if detail else f"yt-dlp exit {process.returncode}")
+
+            logger.info(
+                "[ytdl] %s downloaded as best available and converted to %s at %s",
+                video_id,
+                target_ext,
+                AUDIO_BITRATE if not video else f"<={MAX_HEIGHT}p",
+            )
+            return {
+                "ok": True,
+                "ext": target_ext,
+                "local": str(expected),
+                "title": video_id,
+                "cached": False,
+            }
+        except Exception:
+            shutil.rmtree(job_dir, ignore_errors=True)
+            raise
+
     async def _get_local_result(self, video_id: str, video: bool) -> dict:
         """Download through ytdlgo, retrying format/cookie edge cases."""
         args = ("get", video_id, "--type", "video" if video else "audio")
@@ -339,6 +457,20 @@ class YouTube:
             )
             if not format_error and not bot_error:
                 raise
+
+            if format_error and DIRECT_FALLBACK:
+                logger.warning(
+                    "[ytdl] format selection failed for %s; downloading best available and converting with ffmpeg",
+                    video_id,
+                )
+                try:
+                    return await self._download_best_available(video_id, video)
+                except Exception as direct_error:
+                    logger.warning(
+                        "[ytdl] best-format ffmpeg fallback failed for %s: %s",
+                        video_id,
+                        direct_error,
+                    )
 
             attempts: list[tuple[str, dict[str, str]]] = []
             # native uses a stricter m4a-first selector, so MP3 is a useful
