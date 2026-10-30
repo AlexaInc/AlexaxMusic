@@ -33,5 +33,5 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add tv-channels.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update tv-channels.json [skip ci]" && git push)
+          git add tv-channels.json tv-channels.m3u
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update tv channel lists [skip ci]" && git push)
