@@ -9,6 +9,7 @@ import sys
 # IPTV links to fetch
 M3U_URLS = [
     "https://iptv-org.github.io/iptv/countries/lk.m3u",
+    "https://iptv-org.github.io/iptv/index.m3u",
     "https://iptv-org.github.io/iptv/languages/sin.m3u",
     "https://iptv-org.github.io/iptv/categories/news.m3u",
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
@@ -70,7 +71,6 @@ async def verify_channel(semaphore, channel, timeout=15):
     """Use ffprobe to verify if the stream has a valid video source."""
     async with semaphore:
         url = channel["manifest"]
-        # Use ffprobe to check for video streams.
         cmd = [
             "ffprobe",
             "-v", "error",
@@ -99,7 +99,24 @@ async def verify_channel(semaphore, channel, timeout=15):
                     pass
         except Exception:
             pass
-    return None
+        return None
+
+def save_m3u_playlist(channels, filename="tv-channels.m3u"):
+    """Saves the verified channels into a single categorized M3U file."""
+    lines = ["#EXTM3U"]
+    for ch in channels:
+        tvg_id = ch.get("id", "")
+        logo = ch.get("thumbnail", "")
+        group = ch.get("category", "General")
+        title = ch.get("title", "")
+        manifest = ch.get("manifest", "")
+        
+        extinf = f'#EXTINF:-1 tvg-id="{tvg_id}" tvg-logo="{logo}" group-title="{group}",{title}'
+        lines.append(extinf)
+        lines.append(manifest)
+        
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
 async def main():
     print("Starting TV channel update...")
@@ -159,8 +176,11 @@ async def main():
         # 4. Save to JSON
         with open("tv-channels.json", "w", encoding="utf-8") as f:
             json.dump(working_channels, f, indent=2, ensure_ascii=False)
-        
         print("Updated tv-channels.json successfully.")
+
+        # 5. Save to Categorized M3U Playlist
+        save_m3u_playlist(working_channels, "tv-channels.m3u")
+        print("Updated tv-channels.m3u successfully.")
 
 if __name__ == "__main__":
     asyncio.run(main())
